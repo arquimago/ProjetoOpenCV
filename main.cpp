@@ -22,6 +22,12 @@ aplicar, no mínimo:
 - Cinco filtros espaciais ou morfológicos.
 
 
+
+
+
+melhorar bordas de imagens
+realçar cores
+
 */
 
 //filtro1
