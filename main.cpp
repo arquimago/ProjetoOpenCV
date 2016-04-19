@@ -24,6 +24,18 @@ aplicar, no mínimo:
 
 */
 
+//filtro1
+
+
+//filtro2
+
+
+//filtro3
+
+
+//filtro4
+
+
 //retornar um vídeo processado (também no formato AVI) como saída.
 
 return 0;
