@@ -26,4 +26,6 @@ aplicar, no mínimo:
 
 //retornar um vídeo processado (também no formato AVI) como saída.
 
+return 0;
+
 }
