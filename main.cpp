@@ -21,13 +21,26 @@ aplicar, no mínimo:
 - Três operadores pontuais ou aritméticos;
 - Cinco filtros espaciais ou morfológicos.
 
+*/
+
+/*
+#########################IDEIAS PARA O PROGRAMA#########################
+Algumas sequencias de operações desejaveis:
 
 
+processo com 4 ou mais filtros: esconder informação e extrair informação
+(um programa para esconder informação, embaralhando a imagem)
+(outro para extrair essa informação pelo processo inverso)
+(caso seja usado outro processo para tentar extrair informação, a imagem não deve ser entendível)
 
 
-melhorar bordas de imagens
-realçar cores
+usar operações únicas e reversíveis
+(inversão de cor, escurecimento, realçar picos)
+sequencias de operações reversíveis
+(inversão de cores->escurecimento)
+(realçar picos -> inversão de cores)
 
+###########################################################################
 */
 
 //filtro1
