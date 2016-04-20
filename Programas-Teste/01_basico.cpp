@@ -1,5 +1,4 @@
 #include<opencv2/highgui/highgui.hpp>
-//gcc -o  01_basico` 01_basico.cpp
 
 
 
