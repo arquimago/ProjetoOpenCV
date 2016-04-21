@@ -1,62 +1,96 @@
-
-//imports das bibliotecas
-
+#include <opencv2/highgui/highgui.hpp>
+using namespace cv;
 
 int main (int argc, char** argv){
+    //inicializaÁıes
+    CvCapture* capture = cvCaptureFromAVI("infile.avi"); //video
+    IplImage* frame; //frame do video
 
-//receber um v√≠deo no formato AVI como entrada
-
-/*
-
- o seu programa deve aplicar um conjunto de m√©todos de
-processamento de imagens em cada frame do v√≠deo. 
-A aplica√ß√£o de cada m√©todo deve obrigatoriamente modificar a imagem e ter relev√¢ncia no processo. O conjunto
-de m√©todos aplicados deve resultar em um efeito coerente no v√≠deo final. 
-
-4 m√©todos diferentes devem ser utilizados
-
+    //adquirir propriedades do video
+    int isColor = 1;
+    int fps = ( int )cvGetCaptureProperty( capture, CV_CAP_PROP_FPS );
+    int frameH    = (int) cvGetCaptureProperty(capture, CV_CAP_PROP_FRAME_HEIGHT);
+    int frameW    = (int) cvGetCaptureProperty(capture, CV_CAP_PROP_FRAME_WIDTH);
+    int nFrames = (int) cvGetCaptureProperty(capture,  CV_CAP_PROP_FRAME_COUNT);
 
 
-aplicar, no m√≠nimo:
-- Tr√™s operadores pontuais ou aritm√©ticos;
-- Cinco filtros espaciais ou morfol√≥gicos.
-
-*/
-
-/*
-#########################IDEIAS PARA O PROGRAMA#########################
-Algumas sequencias de opera√ß√µes desejaveis:
+    //retornar um vÌdeo processado (tambÈm no formato AVI) como saÌda.
+    CvVideoWriter *writer = cvCreateVideoWriter("out.avi",CV_FOURCC('P','I','M','1'),
+                           fps,cvSize(frameW,frameH),isColor);
 
 
-processo com 4 ou mais filtros: esconder informa√ß√£o e extrair informa√ß√£o
-(um programa para esconder informa√ß√£o, embaralhando a imagem)
-(outro para extrair essa informa√ß√£o pelo processo inverso)
-(caso seja usado outro processo para tentar extrair informa√ß√£o, a imagem n√£o deve ser entend√≠vel)
+    int key = 0;
+    IplImage* img;
+    for(int i=0;i<nFrames - 1;i++){
+        cvGrabFrame(capture);          // capture a frame
+        img=cvRetrieveFrame(capture);  // retrieve the captured frame
+        cvShowImage("mainWin", img);
+        key=cvWaitKey(20);           // wait 20 ms
+        cvWriteFrame(writer,img);      // add the frame to the file
+
+    }
+
+    /*
+
+     o seu programa deve aplicar um conjunto de mÈtodos de
+    processamento de imagens em cada frame do vÌdeo.
+    A aplicaÁ„o de cada mÈtodo deve obrigatoriamente modificar a imagem e ter relev‚ncia no processo. O conjunto
+    de mÈtodos aplicados deve resultar em um efeito coerente no vÌdeo final.
+
+    4 mÈtodos diferentes devem ser utilizados
 
 
-usar opera√ß√µes √∫nicas e revers√≠veis
-(invers√£o de cor, escurecimento, real√ßar picos)
-sequencias de opera√ß√µes revers√≠veis
-(invers√£o de cores->escurecimento)
-(real√ßar picos -> invers√£o de cores)
 
-###########################################################################
-*/
+    aplicar, no mÌnimo:
+    - TrÍs operadores pontuais ou aritmÈticos;
+    - Cinco filtros espaciais ou morfolÛgicos.
 
-//filtro1
+    */
 
-
-//filtro2
+    /*
+    #########################IDEIAS PARA O PROGRAMA#########################
+    Algumas sequencias de operaÁıes desejaveis:
 
 
-//filtro3
+    processo com 4 ou mais filtros: esconder informaÁ„o e extrair informaÁ„o
+    (um programa para esconder informaÁ„o, embaralhando a imagem)
+    (outro para extrair essa informaÁ„o pelo processo inverso)
+    (caso seja usado outro processo para tentar extrair informaÁ„o, a imagem n„o deve ser entendÌvel)
 
 
-//filtro4
+    usar operaÁıes ˙nicas e reversÌveis
+    (invers„o de cor, escurecimento, realÁar picos)
+    sequencias de operaÁıes reversÌveis
+    (invers„o de cores->escurecimento)
+    (realÁar picos -> invers„o de cores)
+
+    http://docs.opencv.org/2.4/modules/imgproc/doc/filtering.html
+
+    alguns filtros
+    //SUAVIZA«√O cvSmooth(out, out, CV_GAUSSIAN, 9);
 
 
-//retornar um v√≠deo processado (tamb√©m no formato AVI) como sa√≠da.
+    ###########################################################################
+    */
 
-return 0;
+    //filtro1
+
+
+    //filtro2
+
+
+    //filtro3
+
+
+    //filtro4
+
+
+    //release the capture source
+    cvReleaseCapture(&capture);
+    cvReleaseVideoWriter(&writer);
+
+    return 0;
 
 }
+
+

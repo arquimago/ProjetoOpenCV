@@ -1,5 +1,7 @@
 #include<opencv2/highgui/highgui.hpp>
-
+#include "opencv2/imgproc/imgproc.hpp"
+#include <stdlib.h>
+#include <stdio.h>
 using namespace cv;
 
 int main()
@@ -24,7 +26,8 @@ int main()
          img->imageData + y * img->widthStep);
       uchar* ptr_out = (uchar*) (
          out->imageData + y * out->widthStep);
-        
+      
+/*	  
 	int fator = 35.0;
     for( int x=0; x<img->width; x++ ) {
 		 ptr_img[3*x] = ptr_img[3*x] + (x * fator);
@@ -37,10 +40,10 @@ int main()
 		 ptr_out[3*x] = ptr_img[3*x] - (x * fator);
          ptr_out[3*x+1] = ptr_img[3*x+1] - (x * fator);
          ptr_out[3*x+2] = ptr_img[3*x+2] - (x * fator);
-      }
+      }*/
    }
-
-   
+   //sobel cvSobel(img, out, 1, 1, 3 );
+   //suavização cvSmooth(img, out, CV_GAUSSIAN, 9);  
    //exibe a imagem img na janela 
    cvShowImage( "Imagem Original", img );
    
