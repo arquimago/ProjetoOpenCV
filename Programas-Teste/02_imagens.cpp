@@ -24,12 +24,19 @@ int main()
          img->imageData + y * img->widthStep);
       uchar* ptr_out = (uchar*) (
          out->imageData + y * out->widthStep);
-         
-      for( int x=0; x<img->width; x++ ) {
-		 uchar cor = (ptr_img[3*x]+ptr_img[3*x+1]+ptr_img[3*x+2])/3;
-         ptr_out[3*x] = cor;
-         ptr_out[3*x+1] = cor;
-         ptr_out[3*x+2] = cor;
+        
+	int fator = 35.0;
+    for( int x=0; x<img->width; x++ ) {
+		 ptr_img[3*x] = ptr_img[3*x] + (x * fator);
+         ptr_img[3*x+1] =ptr_img[3*x+1] + (x * fator);
+         ptr_img[3*x+2] = ptr_img[3*x+2] +(x * fator);
+      }
+	  
+	  
+	for( int x=0; x<img->width; x++ ) { 
+		 ptr_out[3*x] = ptr_img[3*x] - (x * fator);
+         ptr_out[3*x+1] = ptr_img[3*x+1] - (x * fator);
+         ptr_out[3*x+2] = ptr_img[3*x+2] - (x * fator);
       }
    }
 
