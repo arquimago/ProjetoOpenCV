@@ -8,15 +8,13 @@ using namespace std;
 int main (int argc, char** argv){
     //inicializações
     CvCapture* capture = cvCaptureFromAVI("infile.avi"); //video
-    IplImage* frame; //frame do video
+
     //adquirir propriedades do video
     int isColor = 1;
     int fps = (int)cvGetCaptureProperty( capture, CV_CAP_PROP_FPS );
     int frameH  = (int)cvGetCaptureProperty(capture, CV_CAP_PROP_FRAME_HEIGHT);
     int frameW  = (int)cvGetCaptureProperty(capture, CV_CAP_PROP_FRAME_WIDTH);
     int nFrames = (int)cvGetCaptureProperty(capture,  CV_CAP_PROP_FRAME_COUNT);
-    int widthStep = frame->widthStep;
-    int channels  = frame->nChannels;
     //retornar um vídeo processado (também no formato AVI) como saída.
     CvVideoWriter *writer = cvCreateVideoWriter("out.avi",CV_FOURCC('P','I','M','1'),
                            fps,cvSize(frameW,frameH),isColor);
@@ -49,6 +47,7 @@ int main (int argc, char** argv){
         alguns filtros
         http://docs.opencv.org/2.4/modules/imgproc/doc/miscellaneous_transformations.html
         http://docs.opencv.org/2.4/modules/imgproc/doc/filtering.html
+        http://docs.opencv.org/2.4/modules/core/doc/operations_on_arrays.html
 
         cvSobel(img, img, 1, 1, 3 );
         cvSmooth(img, img, CV_GAUSSIAN, 9);
@@ -58,7 +57,19 @@ int main (int argc, char** argv){
         cvNot(img, img);
         cvCvtColor(img, img, CV_BGR2Luv);
         cvThreshold(img,img, 30, 700, 1);
+        cvAbsDiff(img, img, img);
+        cvAdd(img,img, img);
+        cvAnd(img,img,img);
+        cvOr(img,img,img);
+        cvXor(img,img,img);
+        cvConvertScaleAbs(img,img,3,4);
+        cvDiv(img,img,img,1);
+        cvMul(img,img,img,1);
+        (mais em http://docs.opencv.org/2.4/modules/core/doc/operations_on_arrays.html)
         */
+
+
+
         cvShowImage("Video modificado", img); //mostra imagem modificada
 
         cvWriteFrame(writer,img);      // grava imagem no video de saída
