@@ -6,7 +6,7 @@ using namespace std;
 
 
 int main (int argc, char** argv){
-    //inicializações
+    //inicializaÃ§Ãµes
     CvCapture* capture = cvCaptureFromAVI("infile.avi"); //video
 
     //adquirir propriedades do video
@@ -15,7 +15,7 @@ int main (int argc, char** argv){
     int frameH  = (int)cvGetCaptureProperty(capture, CV_CAP_PROP_FRAME_HEIGHT);
     int frameW  = (int)cvGetCaptureProperty(capture, CV_CAP_PROP_FRAME_WIDTH);
     int nFrames = (int)cvGetCaptureProperty(capture,  CV_CAP_PROP_FRAME_COUNT);
-    //retornar um vídeo processado (também no formato AVI) como saída.
+    //retornar um vÃ­deo processado (tambÃ©m no formato AVI) como saÃ­da.
     CvVideoWriter *writer = cvCreateVideoWriter("out.avi",CV_FOURCC('P','I','M','1'),
                            fps,cvSize(frameW,frameH),isColor);
 
@@ -26,23 +26,23 @@ int main (int argc, char** argv){
         img=cvRetrieveFrame(capture);  // recupera a imagem capturada
         cvShowImage("Video Original", img); //mostra imagem original
         /*
-        o seu programa deve aplicar um conjunto de métodos de
-        processamento de imagens em cada frame do vídeo.
-        A aplicação de cada método deve obrigatoriamente modificar a imagem e ter relevância no processo. O conjunto
-        de métodos aplicados deve resultar em um efeito coerente no vídeo final.
+        o seu programa deve aplicar um conjunto de mÃ©todos de
+        processamento de imagens em cada frame do vÃ­deo.
+        A aplicaÃ§Ã£o de cada mÃ©todo deve obrigatoriamente modificar a imagem e ter relevÃ¢ncia no processo. O conjunto
+        de mÃ©todos aplicados deve resultar em um efeito coerente no vÃ­deo final.
 
-        4 métodos diferentes devem ser utilizados
+        4 mÃ©todos diferentes devem ser utilizados
 
-        aplicar, no mínimo:
-        - Três operadores pontuais ou aritméticos;
-        - Cinco filtros espaciais ou morfológicos.
+        aplicar, no mÃ­nimo:
+        - TrÃªs operadores pontuais ou aritmÃ©ticos;
+        - Cinco filtros espaciais ou morfolÃ³gicos.
 
 
 
-        processo com 4 ou mais filtros: esconder informação e extrair informação
-        (um programa para esconder informação, embaralhando a imagem)
-        (outro para extrair essa informação pelo processo inverso)
-        (caso seja usado outro processo para tentar extrair informação, a imagem não deve ser entendível)
+        processo com 4 ou mais filtros: esconder informaÃ§Ã£o e extrair informaÃ§Ã£o
+        (um programa para esconder informaÃ§Ã£o, embaralhando a imagem)
+        (outro para extrair essa informaÃ§Ã£o pelo processo inverso)
+        (caso seja usado outro processo para tentar extrair informaÃ§Ã£o, a imagem nÃ£o deve ser entendÃ­vel)
 
         alguns filtros
         http://docs.opencv.org/2.4/modules/imgproc/doc/miscellaneous_transformations.html
@@ -80,7 +80,7 @@ int main (int argc, char** argv){
 
         cvShowImage("Video modificado", img); //mostra imagem modificada
 
-        cvWriteFrame(writer,img);      // grava imagem no video de saída
+        cvWriteFrame(writer,img);      // grava imagem no video de saÃ­da
         cvWaitKey(1);           // espera 1ms
     }
 
@@ -93,43 +93,40 @@ int main (int argc, char** argv){
 
 /*
 
-DICAS CLAUDIO
-
-Ah..... Massa!!!!
-
-Você pode ao invés de modificar o tom dos pixels, embaralhá-los mudando suas posições (x, y) (e talvez incrementando com uma operação de soma subtração ou inversão). Isso é inversível... É só você pensar numa função que mapeie os pixels para outras posições e fazer a inversa depois.
-
-Para esse caso onde o seu objetivo não é manter o bom aspecto e sim embaralhar. As operações de soma e subtração são úteis sim. Uma vez que se der overflow não é problema, já que seu objetivo é bugar a vida de quem tentar assistir (o vídeo criptografado).
-
-Por via das dúvidas... Pergunte a Beatriz se ela consideraria o processamento de shuffle dos pixels.
 
 
+selecionar um frame do vÃ­deo com 
+#include <limits.h>
+int max = INT_MAX;
+int frameKey = max % nframe;
 
-DICAS BEATRIZ
-(NÃO SERVE NO NOSSO CAS0)
-gerar imagem com mod (tamanho de frames)
-essa imagem sofrerá pouca alteração.
-através dessa imagem, revertida por um processo simples,
-será gerada nossa imagem que usaremos operações extras.
+essa imagem sofrerÃ¡ pouca alteraÃ§Ã£o (usaremos processos reversÃ­veis)
+atravÃ©s dessa imagem,que pode ser revertida por uma sequencia simples de operaÃ§Ãµes,
+serÃ¡ gerada uma imagem a partir de operaÃ§Ãµes complexas e essa mesma imagem serÃ¡ somada ao resto do video.
+
+no processo inverso, Ã© sÃ³ descobrir o frameKey, subtraÃ­-lo do resto do video e fazer o processo inverso para esse frame especifico
+
 
 gerar imagem (aplicando processos mais complexos)
 somar com imagem filme
 processo inverso gerar e subtrair
 
-
-
-complemento da erosão de a por b é igual ao complemento de a dilatado em espelho de b
-
-(ida)pega imagem a, dilata em b, tira complemento
-(vinda) pega imagem a' erode em b, tira complemento pelo espelho da máscara
-
-
-
-operações inversas entre abertura e fechamento
-complemento do fechamento de a por b é igual ao complemento de A aberto por espelho de b
-
-
-
-procurar operação complemento opencv
+procurar
 espelhamento
+
+
+
+
+DICAS CLAUDIO
+
+Ah..... Massa!!!!
+
+VocÃª pode ao invÃ©s de modificar o tom dos pixels, embaralhÃ¡-los mudando suas posiÃ§Ãµes (x, y) (e talvez incrementando com uma operaÃ§Ã£o de soma subtraÃ§Ã£o ou inversÃ£o). Isso Ã© inversÃ­vel... Ã‰ sÃ³ vocÃª pensar numa funÃ§Ã£o que mapeie os pixels para outras posiÃ§Ãµes e fazer a inversa depois.
+
+Para esse caso onde o seu objetivo nÃ£o Ã© manter o bom aspecto e sim embaralhar. As operaÃ§Ãµes de soma e subtraÃ§Ã£o sÃ£o Ãºteis sim. Uma vez que se der overflow nÃ£o Ã© problema, jÃ¡ que seu objetivo Ã© bugar a vida de quem tentar assistir (o vÃ­deo criptografado).
+
+Por via das dÃºvidas... Pergunte a Beatriz se ela consideraria o processamento de shuffle dos pixels.
+
+
+
 */
