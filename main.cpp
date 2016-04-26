@@ -68,6 +68,14 @@ int main (int argc, char** argv){
         (mais em http://docs.opencv.org/2.4/modules/core/doc/operations_on_arrays.html)
         */
 
+        //cvNot(img, img);
+        //cvErode(img,img, NULL, 1 );
+        //cvNot(img, img);
+        //=
+        //cvDilate(img,img, NULL, 1 );
+
+
+
 
 
         cvShowImage("Video modificado", img); //mostra imagem modificada
@@ -83,4 +91,45 @@ int main (int argc, char** argv){
 
 }
 
+/*
 
+DICAS CLAUDIO
+
+Ah..... Massa!!!!
+
+Você pode ao invés de modificar o tom dos pixels, embaralhá-los mudando suas posições (x, y) (e talvez incrementando com uma operação de soma subtração ou inversão). Isso é inversível... É só você pensar numa função que mapeie os pixels para outras posições e fazer a inversa depois.
+
+Para esse caso onde o seu objetivo não é manter o bom aspecto e sim embaralhar. As operações de soma e subtração são úteis sim. Uma vez que se der overflow não é problema, já que seu objetivo é bugar a vida de quem tentar assistir (o vídeo criptografado).
+
+Por via das dúvidas... Pergunte a Beatriz se ela consideraria o processamento de shuffle dos pixels.
+
+
+
+DICAS BEATRIZ
+(NÃO SERVE NO NOSSO CAS0)
+gerar imagem com mod (tamanho de frames)
+essa imagem sofrerá pouca alteração.
+através dessa imagem, revertida por um processo simples,
+será gerada nossa imagem que usaremos operações extras.
+
+gerar imagem (aplicando processos mais complexos)
+somar com imagem filme
+processo inverso gerar e subtrair
+
+
+
+complemento da erosão de a por b é igual ao complemento de a dilatado em espelho de b
+
+(ida)pega imagem a, dilata em b, tira complemento
+(vinda) pega imagem a' erode em b, tira complemento pelo espelho da máscara
+
+
+
+operações inversas entre abertura e fechamento
+complemento do fechamento de a por b é igual ao complemento de A aberto por espelho de b
+
+
+
+procurar operação complemento opencv
+espelhamento
+*/
