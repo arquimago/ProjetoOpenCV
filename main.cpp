@@ -1,6 +1,8 @@
 // OVERFLOW DE CORES
 //saturation
 //http://answers.opencv.org/question/13769/adding-matrices-without-saturation/
+//por algum motivo que não descobri, ao somar valores muito baixos ou muito altos ,a imagem não se altera
+//imagem estoura e volta para a mesma posição com 255 e não muda ao somar com 0
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -24,21 +26,18 @@ int main (int argc, char** argv){
 
     // imagem chave
     //Imagem pra guardar o resultado da operação
+    int fator = 35;
     IplImage* key = cvCreateImage(cvSize(frameW,frameH), IPL_DEPTH_8U, 3);
     for( int y=0; y < key->height; y++ ) {
         uchar* ptr_key = (uchar*) (key->imageData + y * key->widthStep);
 
-
         for( int x=0; x < key->width; x++ ) {
-
-             ptr_key[3*x]   =  255;
-             ptr_key[3*x+1] =  255;
-             ptr_key[3*x+2] =  255;
-
+             ptr_key[3*x]   = 0 +(x * fator);
+             ptr_key[3*x+1] = 0 +(x * fator);
+             ptr_key[3*x+2] = 0 +(x * fator);
         }
     }
-
-    //cvShowImage( "imagem chave", key );
+    cvShowImage( "imagem chave", key );
 
 
 
@@ -92,11 +91,12 @@ int main (int argc, char** argv){
         (mais em http://docs.opencv.org/2.4/modules/core/doc/operations_on_arrays.html)
         */
 
-        for( int y=0; y<img->height; y++ ) {
-            uchar* ptr_img = (uchar*) (img->imageData + y * img->widthStep);
+        //SOMA SEM SATURAÇÃO
+        for( int y=0; y < frameH; y++ ) {
+            uchar* ptr_img = (uchar*) (img->imageData + y * img->widthStep) ;
             uchar* ptr_key = (uchar*) (key->imageData + y * img->widthStep);
 
-            for( int x=0; x<img->width; x++ ) {
+            for( int x=0; x<frameW; x++ ) {
                 ptr_img[3*x]   = ptr_img[3*x] + ptr_key[3*x];
                 ptr_img[3*x+1] = ptr_img[3*x+1] + ptr_key[3*x+1];
                 ptr_img[3*x+2] = ptr_img[3*x+2] + ptr_key[3*x+2];
@@ -112,6 +112,8 @@ int main (int argc, char** argv){
     //liberar recursos
     cvReleaseCapture(&capture);
     cvReleaseVideoWriter(&writer);
+
+
     return 0;
 
 }
