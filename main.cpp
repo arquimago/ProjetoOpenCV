@@ -68,8 +68,9 @@ int main (int argc, char** argv){
              ptr_key[3 * x + 2] = nRand;
         }
     }
-    cvShowImage("imagem chave",keyImg);
 
+    //tentar or ou and
+    cvShowImage("imagem chave",keyImg);
 
 
     //PROCESSAMENTO E GRAVAÇÃO
@@ -78,7 +79,7 @@ int main (int argc, char** argv){
     for(int i = 0;i < nFrames - 1;i++){
         cvGrabFrame(capture);          // captura imagem
         img = cvRetrieveFrame(capture);  // recupera a imagem capturada
-        cvShowImage("Video Original",img); //mostra imagem original
+        //cvShowImage("Video Original",img); //mostra imagem original
         /*
         o seu programa deve aplicar um conjunto de métodos de
         processamento de imagens em cada frame do vídeo.
@@ -104,10 +105,10 @@ int main (int argc, char** argv){
         http://docs.opencv.org/2.4/modules/core/doc/operations_on_arrays.html
         http://docs.opencv.org/2.4/modules/core/doc/operations_on_arrays.html
 
-        cvSobel(img, img, 1, 1, 3 );
+        cvSobel(img,img,1,1,3);
         cvSmooth(img, img, CV_GAUSSIAN, 9);
-        cvLaplace(img, img, 3 );
-        cvDilate(img,img, NULL, 5 );
+        cvLaplace(img,img,3);
+        cvDilate(img,img,NULL,5);
         cvErode(img,img, NULL, 5 );
         cvCvtColor(img, img, CV_BGR2Luv);
         cvThreshold(img,img, 30, 700, 1);
@@ -137,9 +138,10 @@ int main (int argc, char** argv){
             }
         }
 
+
         //usar mais algumas operações reversíveis
 
-        cvShowImage("Video modificado",img); //mostra imagem modificada
+        //cvShowImage("Video modificado",img); //mostra imagem modificada
         cvWriteFrame(writer,img);      // grava imagem no video de saída
         cvWaitKey(1);           // espera 1ms
        }
