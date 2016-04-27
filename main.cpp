@@ -1,16 +1,56 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
+#include <time.h>
+
+
+#include <stdio.h>
+
+
+
+int aleatorio(int seed) {
+ int maxI =1000;
+ int r[maxI];
+ unsigned int retorno;
+ int i;
+
+ r[0] = seed;
+ for (i=1; i<31; i++) {
+   r[i] = (16807LL * r[i-1]) % 2147483647;
+   if (r[i] < 0) {
+     r[i] += 2147483647;
+   }
+ }
+ for (i=31; i<34; i++) {
+   r[i] = r[i-31];
+ }
+ for (i=34; i<344; i++) {
+   r[i] = r[i-31] + r[i-3];
+ }
+ for (i=344; i<maxI; i++) {
+   r[i] = r[i-31] + r[i-3];
+   retorno = ((unsigned int)r[i]) >> 1;
+ }
+ return retorno;
+}
+
+
+
+
 
 int main (int argc, char** argv){
     //INICIALIZAÇÕES
     //video inicial
+
     CvCapture* capture = cvCaptureFromAVI("infile.avi");
     //propriedades do video
-    int nFrames = (int)cvGetCaptureProperty(capture, CV_CAP_PROP_FRAME_COUNT);
-    int fps     = (int)cvGetCaptureProperty(capture, CV_CAP_PROP_FPS);
-    int frameH  = (int)cvGetCaptureProperty(capture, CV_CAP_PROP_FRAME_HEIGHT);
-    int frameW  = (int)cvGetCaptureProperty(capture, CV_CAP_PROP_FRAME_WIDTH);
+    int key = 5;
+    int nFrames = (int)cvGetCaptureProperty(capture,CV_CAP_PROP_FRAME_COUNT);
+    int fps     = (int)cvGetCaptureProperty(capture,CV_CAP_PROP_FPS);
+    int frameH  = (int)cvGetCaptureProperty(capture,CV_CAP_PROP_FRAME_HEIGHT);
+    int frameW  = (int)cvGetCaptureProperty(capture,CV_CAP_PROP_FRAME_WIDTH);
+    srand(key);
+
     //video final
     CvVideoWriter *writer = cvCreateVideoWriter("out.avi",CV_FOURCC('P','I','M','1'),
                            fps,cvSize(frameW,frameH),1);
@@ -18,16 +58,17 @@ int main (int argc, char** argv){
     int fator = 100;
     //frameW/5/2;
     //100 é um bom valor
-    IplImage* key = cvCreateImage(cvSize(frameW,frameH),IPL_DEPTH_8U,3);
-    for(int y = 0;y < key->height;y++) {
-        uchar* ptr_key = (uchar*) (key->imageData + y * key->widthStep);
-        for(int x = 0;x < key->width;x++) {
-             ptr_key[3 * x]     = (x * fator);
-             ptr_key[3 * x + 1] = (x * fator);
-             ptr_key[3 * x + 2] = (x * fator);
+    IplImage* keyImg = cvCreateImage(cvSize(frameW,frameH),IPL_DEPTH_8U,3);
+    for(int y = 0;y < keyImg->height;y++) {
+        uchar* ptr_key = (uchar*) (keyImg->imageData + y * keyImg->widthStep);
+        for(int x = 0;x < keyImg->width;x++){
+             int nRand = aleatorio(key + (x * y))%256;
+             ptr_key[3 * x]     = nRand;
+             ptr_key[3 * x + 1] = nRand;
+             ptr_key[3 * x + 2] = nRand;
         }
     }
-    //cvShowImage("imagem chave",key);
+    cvShowImage("imagem chave",keyImg);
 
 
 
@@ -88,7 +129,7 @@ int main (int argc, char** argv){
         //operação de soma sem utilizar a saturação
         for(int y=0;y < frameH;y++) {
             uchar* ptr_img = (uchar*)(img->imageData + y * img->widthStep);
-            uchar* ptr_key = (uchar*)(key->imageData + y * img->widthStep);
+            uchar* ptr_key = (uchar*)(keyImg->imageData + y * img->widthStep);
             for(int x=0; x<frameW; x++) {
                 ptr_img[3*x]   = ptr_img[3*x]   + ptr_key[3*x];
                 ptr_img[3*x+1] = ptr_img[3*x+1] + ptr_key[3*x+1];
