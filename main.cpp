@@ -1,17 +1,9 @@
-// OVERFLOW DE CORES
-//saturation
-//http://answers.opencv.org/question/13769/adding-matrices-without-saturation/
-//por algum motivo que não descobri, ao somar valores muito baixos ou muito altos ,a imagem não se altera
-//imagem estoura e volta para a mesma posição com 255 e não muda ao somar com 0
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
-#include <limits.h>
-using namespace cv;
-using namespace std;
 
 int main (int argc, char** argv){
-    //inicializações
+    //INICIALIZAÇÕES
     //video inicial
     CvCapture* capture = cvCaptureFromAVI("infile.avi");
     //propriedades do video
@@ -22,32 +14,30 @@ int main (int argc, char** argv){
     //video final
     CvVideoWriter *writer = cvCreateVideoWriter("out.avi",CV_FOURCC('P','I','M','1'),
                            fps,cvSize(frameW,frameH),1);
-
-
-    // imagem chave
-    //Imagem pra guardar o resultado da operação
-    int fator = 35;
-    IplImage* key = cvCreateImage(cvSize(frameW,frameH), IPL_DEPTH_8U, 3);
-    for( int y=0; y < key->height; y++ ) {
+    // imagem chave guardar o resultado da operação
+    int fator = 100;
+    //frameW/5/2;
+    //100 é um bom valor
+    IplImage* key = cvCreateImage(cvSize(frameW,frameH),IPL_DEPTH_8U,3);
+    for(int y = 0;y < key->height;y++) {
         uchar* ptr_key = (uchar*) (key->imageData + y * key->widthStep);
-
-        for( int x=0; x < key->width; x++ ) {
-             ptr_key[3*x]   = 0 +(x * fator);
-             ptr_key[3*x+1] = 0 +(x * fator);
-             ptr_key[3*x+2] = 0 +(x * fator);
+        for(int x = 0;x < key->width;x++) {
+             ptr_key[3 * x]     = (x * fator);
+             ptr_key[3 * x + 1] = (x * fator);
+             ptr_key[3 * x + 2] = (x * fator);
         }
     }
-    cvShowImage( "imagem chave", key );
+    //cvShowImage("imagem chave",key);
 
 
 
-    //escrita e processamento
+    //PROCESSAMENTO E GRAVAÇÃO
     IplImage* img;
-    cvSetCaptureProperty(capture, CV_CAP_PROP_POS_FRAMES, 0);
-    for(int i=0;i<nFrames - 1;i++){
+    cvSetCaptureProperty(capture,CV_CAP_PROP_POS_FRAMES,0);
+    for(int i = 0;i < nFrames - 1;i++){
         cvGrabFrame(capture);          // captura imagem
-        img=cvRetrieveFrame(capture);  // recupera a imagem capturada
-        cvShowImage("Video Original", img); //mostra imagem original
+        img = cvRetrieveFrame(capture);  // recupera a imagem capturada
+        cvShowImage("Video Original",img); //mostra imagem original
         /*
         o seu programa deve aplicar um conjunto de métodos de
         processamento de imagens em cada frame do vídeo.
@@ -67,9 +57,10 @@ int main (int argc, char** argv){
         (outro para extrair essa informação pelo processo inverso)
         (caso seja usado outro processo para tentar extrair informação, a imagem não deve ser entendível)
 
-        alguns filtros
+        algumas operações
         http://docs.opencv.org/2.4/modules/imgproc/doc/miscellaneous_transformations.html
         http://docs.opencv.org/2.4/modules/imgproc/doc/filtering.html
+        http://docs.opencv.org/2.4/modules/core/doc/operations_on_arrays.html
         http://docs.opencv.org/2.4/modules/core/doc/operations_on_arrays.html
 
         cvSobel(img, img, 1, 1, 3 );
@@ -77,7 +68,6 @@ int main (int argc, char** argv){
         cvLaplace(img, img, 3 );
         cvDilate(img,img, NULL, 5 );
         cvErode(img,img, NULL, 5 );
-        cvNot(img, img);
         cvCvtColor(img, img, CV_BGR2Luv);
         cvThreshold(img,img, 30, 700, 1);
         cvAbsDiff(img, img, img);
@@ -88,38 +78,40 @@ int main (int argc, char** argv){
         cvConvertScaleAbs(img,img,3,4);
         cvDiv(img,img,img,1);
         cvMul(img,img,img,1);
-        (mais em http://docs.opencv.org/2.4/modules/core/doc/operations_on_arrays.html)
+
+        reversíveis
+        cvFlip(img,img,-1);
+        cvNot(img, img);
         */
 
-        //SOMA SEM SATURAÇÃO
-        for( int y=0; y < frameH; y++ ) {
-            uchar* ptr_img = (uchar*) (img->imageData + y * img->widthStep) ;
-            uchar* ptr_key = (uchar*) (key->imageData + y * img->widthStep);
-
-            for( int x=0; x<frameW; x++ ) {
-                ptr_img[3*x]   = ptr_img[3*x] + ptr_key[3*x];
+        //soma dos frames do video com a imagem chave
+        //operação de soma sem utilizar a saturação
+        for(int y=0;y < frameH;y++) {
+            uchar* ptr_img = (uchar*)(img->imageData + y * img->widthStep);
+            uchar* ptr_key = (uchar*)(key->imageData + y * img->widthStep);
+            for(int x=0; x<frameW; x++) {
+                ptr_img[3*x]   = ptr_img[3*x]   + ptr_key[3*x];
                 ptr_img[3*x+1] = ptr_img[3*x+1] + ptr_key[3*x+1];
                 ptr_img[3*x+2] = ptr_img[3*x+2] + ptr_key[3*x+2];
             }
         }
 
+        //usar mais algumas operações reversíveis
 
-        cvShowImage("Video modificado", img); //mostra imagem modificada
+        cvShowImage("Video modificado",img); //mostra imagem modificada
         cvWriteFrame(writer,img);      // grava imagem no video de saída
         cvWaitKey(1);           // espera 1ms
        }
 
-    //liberar recursos
+
+
+    //LIBERAÇÃO DE RECURSOS
     cvReleaseCapture(&capture);
     cvReleaseVideoWriter(&writer);
-
-
     return 0;
-
 }
 
 /*
-
 gerar imagem listras brancas e pretas
 
 através dessa imagem,
@@ -127,26 +119,18 @@ será gerada uma imagem por:
 processamento a e somada a frames de numero par
 processamento b e somada a frames de numero impar
 
-
-
-gerar imagem (aplicando processos mais complexos)
-somar com imagem filme
-processo inverso gerar e subtrair
+processo inverso gerar e subtrair.
 
 procurar
 espelhamento
-
-
-
+shuffle
 
 DICAS CLAUDIO
 
 Ah..... Massa!!!!
-
-Você pode ao invés de modificar o tom dos pixels, embaralhá-los mudando suas posições (x, y) (e talvez incrementando com uma operação de soma subtração ou inversão). Isso é inversível... É só você pensar numa função que mapeie os pixels para outras posições e fazer a inversa depois.
-
-Para esse caso onde o seu objetivo não é manter o bom aspecto e sim embaralhar. As operações de soma e subtração são úteis sim. Uma vez que se der overflow não é problema, já que seu objetivo é bugar a vida de quem tentar assistir (o vídeo criptografado).
-
+Você pode ao invés de modificar o tom dos pixels, embaralhá-los mudando suas posições (x, y) (e talvez incrementando com uma operação de soma subtração ou inversão). Isso é inversível...
+É só você pensar numa função que mapeie os pixels para outras posições e fazer a inversa depois.
+Para esse caso onde o seu objetivo não é manter o bom aspecto e sim embaralhar.
+As operações de soma e subtração são úteis sim. Uma vez que se der overflow não é problema, já que seu objetivo é bugar a vida de quem tentar assistir (o vídeo criptografado).
 Por via das dúvidas... Pergunte a Beatriz se ela consideraria o processamento de shuffle dos pixels.
-
 */

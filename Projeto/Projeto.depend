@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1461727958 source:c:\users\icaro\documents\github\projetoopencv\main.cpp
+1461772118 source:c:\users\icaro\documents\github\projetoopencv\main.cpp
 	<opencv2/highgui/highgui.hpp>
 	<opencv2/core/core.hpp>
 	<opencv2/imgproc/imgproc.hpp>
@@ -278,13 +278,6 @@
 
 1450444604 c:\opencv\include\opencv2\videoio\videoio_c.h
 	"opencv2/core/core_c.h"
-
-1449835036 c:\opencv\include\opencv\cv.h
-	"opencv2/core/core_c.h"
-	"opencv2/imgproc/imgproc_c.h"
-	"opencv2/photo/photo_c.h"
-	"opencv2/video/tracking_c.h"
-	"opencv2/objdetect/objdetect_c.h"
 
 1449835036 c:\opencv\include\opencv2\core\core.hpp
 	"opencv2/core.hpp"
