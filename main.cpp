@@ -1,26 +1,50 @@
+// OVERFLOW DE CORES
+//saturation
+//http://answers.opencv.org/question/13769/adding-matrices-without-saturation/
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
+#include <limits.h>
 using namespace cv;
 using namespace std;
 
-
 int main (int argc, char** argv){
     //inicializações
-    CvCapture* capture = cvCaptureFromAVI("infile.avi"); //video
-
-    //adquirir propriedades do video
-    int isColor = 1;
-    int fps = (int)cvGetCaptureProperty( capture, CV_CAP_PROP_FPS );
+    //video inicial
+    CvCapture* capture = cvCaptureFromAVI("infile.avi");
+    //propriedades do video
+    int nFrames = (int)cvGetCaptureProperty(capture, CV_CAP_PROP_FRAME_COUNT);
+    int fps     = (int)cvGetCaptureProperty(capture, CV_CAP_PROP_FPS);
     int frameH  = (int)cvGetCaptureProperty(capture, CV_CAP_PROP_FRAME_HEIGHT);
     int frameW  = (int)cvGetCaptureProperty(capture, CV_CAP_PROP_FRAME_WIDTH);
-    int nFrames = (int)cvGetCaptureProperty(capture,  CV_CAP_PROP_FRAME_COUNT);
-    //retornar um vídeo processado (também no formato AVI) como saída.
+    //video final
     CvVideoWriter *writer = cvCreateVideoWriter("out.avi",CV_FOURCC('P','I','M','1'),
-                           fps,cvSize(frameW,frameH),isColor);
+                           fps,cvSize(frameW,frameH),1);
 
-    // processamento
+
+    // imagem chave
+    //Imagem pra guardar o resultado da operação
+    IplImage* key = cvCreateImage(cvSize(frameW,frameH), IPL_DEPTH_8U, 3);
+    for( int y=0; y < key->height; y++ ) {
+        uchar* ptr_key = (uchar*) (key->imageData + y * key->widthStep);
+
+
+        for( int x=0; x < key->width; x++ ) {
+
+             ptr_key[3*x]   =  255;
+             ptr_key[3*x+1] =  255;
+             ptr_key[3*x+2] =  255;
+
+        }
+    }
+
+    //cvShowImage( "imagem chave", key );
+
+
+
+    //escrita e processamento
     IplImage* img;
+    cvSetCaptureProperty(capture, CV_CAP_PROP_POS_FRAMES, 0);
     for(int i=0;i<nFrames - 1;i++){
         cvGrabFrame(capture);          // captura imagem
         img=cvRetrieveFrame(capture);  // recupera a imagem capturada
@@ -68,21 +92,22 @@ int main (int argc, char** argv){
         (mais em http://docs.opencv.org/2.4/modules/core/doc/operations_on_arrays.html)
         */
 
-        //cvNot(img, img);
-        //cvErode(img,img, NULL, 1 );
-        //cvNot(img, img);
-        //=
-        //cvDilate(img,img, NULL, 1 );
+        for( int y=0; y<img->height; y++ ) {
+            uchar* ptr_img = (uchar*) (img->imageData + y * img->widthStep);
+            uchar* ptr_key = (uchar*) (key->imageData + y * img->widthStep);
 
-
-
+            for( int x=0; x<img->width; x++ ) {
+                ptr_img[3*x]   = ptr_img[3*x] + ptr_key[3*x];
+                ptr_img[3*x+1] = ptr_img[3*x+1] + ptr_key[3*x+1];
+                ptr_img[3*x+2] = ptr_img[3*x+2] + ptr_key[3*x+2];
+            }
+        }
 
 
         cvShowImage("Video modificado", img); //mostra imagem modificada
-
         cvWriteFrame(writer,img);      // grava imagem no video de saída
         cvWaitKey(1);           // espera 1ms
-    }
+       }
 
     //liberar recursos
     cvReleaseCapture(&capture);
@@ -93,18 +118,13 @@ int main (int argc, char** argv){
 
 /*
 
+gerar imagem listras brancas e pretas
 
+através dessa imagem,
+será gerada uma imagem por:
+processamento a e somada a frames de numero par
+processamento b e somada a frames de numero impar
 
-selecionar um frame do vídeo com 
-#include <limits.h>
-int max = INT_MAX;
-int frameKey = max % nframe;
-
-essa imagem sofrerá pouca alteração (usaremos processos reversíveis)
-através dessa imagem,que pode ser revertida por uma sequencia simples de operações,
-será gerada uma imagem a partir de operações complexas e essa mesma imagem será somada ao resto do video.
-
-no processo inverso, é só descobrir o frameKey, subtraí-lo do resto do video e fazer o processo inverso para esse frame especifico
 
 
 gerar imagem (aplicando processos mais complexos)
@@ -126,7 +146,5 @@ Você pode ao invés de modificar o tom dos pixels, embaralhá-los mudando suas 
 Para esse caso onde o seu objetivo não é manter o bom aspecto e sim embaralhar. As operações de soma e subtração são úteis sim. Uma vez que se der overflow não é problema, já que seu objetivo é bugar a vida de quem tentar assistir (o vídeo criptografado).
 
 Por via das dúvidas... Pergunte a Beatriz se ela consideraria o processamento de shuffle dos pixels.
-
-
 
 */
