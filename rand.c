@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 int aleatorio(int seed) {
  int maxI =1000;
@@ -33,7 +34,7 @@ int main(){
 	srand(5);
 	int i;
 	for(i=0;i<10;i++){
-		printf("%d \n", aleatorio(5)%256);
+		printf("%d \n", aleatorio(time(NULL)%256));
 	}
 
 }
