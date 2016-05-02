@@ -9,34 +9,62 @@
 
 
 int aleatorio(int seed) {
- int maxI =1000;
- int r[maxI];
- unsigned int retorno;
- int i;
+	int maxI =1000;
+	int r[maxI];
+	unsigned int retorno;
+	int i;
 
- r[0] = seed;
- for (i=1; i<31; i++) {
-   r[i] = (16807LL * r[i-1]) % 2147483647;
-   if (r[i] < 0) {
-     r[i] += 2147483647;
-   }
- }
- for (i=31; i<34; i++) {
-   r[i] = r[i-31];
- }
- for (i=34; i<344; i++) {
-   r[i] = r[i-31] + r[i-3];
- }
- for (i=344; i<maxI; i++) {
-   r[i] = r[i-31] + r[i-3];
-   retorno = ((unsigned int)r[i]) >> 1;
- }
- return retorno;
+	r[0] = seed;
+	for (i=1; i<31; i++) {
+		r[i] = (16807LL * r[i-1]) % 2147483647;
+		if (r[i] < 0) {
+			r[i] += 2147483647;
+		}
+	}
+	for (i=31; i<34; i++) {
+		r[i] = r[i-31];
+	}
+	for (i=34; i<344; i++) {
+		r[i] = r[i-31] + r[i-3];
+	}
+	for (i=344; i<maxI; i++) {
+		r[i] = r[i-31] + r[i-3];
+		retorno = ((unsigned int)r[i]) >> 1;
+	}
+	return retorno;
 }
 
+void filtro1(IplImage* img){
+	
+}
 
+void filtro2(IplImage* img){
+	
+}
 
+void filtro3(IplImage* img){
+	
+}
 
+void filtro4(IplImage* img){
+	
+}
+
+void filtro5(IplImage* img){
+	
+}
+
+void filtro6(IplImage* img){
+	
+}
+
+void filtro7(IplImage* img){
+	
+}
+
+void filtro8(IplImage* img){
+	
+}
 
 int main (int argc, char** argv){
     //INICIALIZAÇÕES
