@@ -1,11 +1,19 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
-#include <time.h>
+//#include <time.h>
 
 
 #include <stdio.h>
 
+int nFrames,fps,frameH,frameW;
+
+void troca(IplImage* n1, IplImage* n2){
+	IplImage temp = *n1;
+	*n1 = *n2;
+	*n2 = temp;
+	return;
+}
 
 
 int aleatorio(int seed) {
@@ -34,60 +42,135 @@ int aleatorio(int seed) {
 	return retorno;
 }
 
-void filtro1(IplImage* img){
+void filtro1(IplImage* img, IplImage* img2, int mask){
+	//max
+	for(int y=0;y < frameH;y++) {
+        if(y-mask/2<=0) continue;
+		uchar* ptr_img = (uchar*)(img->imageData + y * img->widthStep);
+        uchar* ptr_img2 = (uchar*)(img2->imageData + y * img->widthStep);
+		for(int x=0; x<frameW; x++) {
+			if(x-mask/2<=0) continue;
+			uchar maior[3];
+			maior[0] = 0;
+			maior[1] = 0;
+			maior[2] = 0;
+            int y_mask, x_mask;
+			y_mask=y-mask/2;
+			x_mask=x-mask/2;
+			for(y_mask; y_mask<(y+mask/2); y_mask++){
+				for(x_mask; x_mask<(x+mask/2); x_mask++){
+					//encontrar o maximo
+					if(ptr_img[3*x_mask] > maior[0]) maior[0] = ptr_img[3*x_mask];
+					if(ptr_img[3*x_mask+1] > maior[1]) maior[1] = ptr_img[3*x_mask+1];
+					if(ptr_img[3*x_mask+2] > maior[2]) maior[2] = ptr_img[3*x_mask+2];	
+				}
+			}
+			ptr_img2[3*x]=maior[0];
+			ptr_img2[3*x+1]=maior[1];
+			ptr_img2[3*x+2]=maior[2];
+        }
+    }
+	troca(img,img2);
+}
+
+void filtro2(IplImage* img, IplImage* img2, int mask){
+	//soma os pixels em volta (mascara)
+	for(int y=0;y < frameH;y++) {
+        if(y-mask/2<=0) continue;
+		uchar* ptr_img = (uchar*)(img->imageData + y * img->widthStep);
+        uchar* ptr_img2 = (uchar*)(img2->imageData + y * img->widthStep);
+		for(int x=0; x<frameW; x++) {
+			if(x-mask/2<=0) continue;
+			uchar maior[3];
+			maior[0] = 0;
+			maior[1] = 0;
+			maior[2] = 0;
+            int y_mask, x_mask;
+			y_mask=y-mask/2;
+			x_mask=x-mask/2;
+			for(y_mask; y_mask<(y+mask/2); y_mask++){
+				for(x_mask; x_mask<(x+mask/2); x_mask++){
+					//encontrar o maximo
+					maior[0]+= ptr_img[3*x_mask];
+					maior[1]+= ptr_img[3*x_mask+1];
+					maior[2]+= ptr_img[3*x_mask+2];	
+				}
+			}
+			ptr_img2[3*x]=maior[0];
+			ptr_img2[3*x+1]=maior[1];
+			ptr_img2[3*x+2]=maior[2];
+        }
+    }
+	troca(img,img2);
+}
+
+void filtro3(IplImage* img, IplImage* img2,int mask){
+	//min
+	for(int y=0;y < frameH;y++) {
+        if(y-mask/2<=0) continue;
+		uchar* ptr_img = (uchar*)(img->imageData + y * img->widthStep);
+        uchar* ptr_img2 = (uchar*)(img2->imageData + y * img->widthStep);
+		for(int x=0; x<frameW; x++) {
+			if(x-mask/2<=0) continue;
+			uchar menor[3];
+			menor[0] = 255;
+			menor[1] = 255;
+			menor[2] = 255;
+            int y_mask, x_mask;
+			y_mask=y-mask/2;
+			x_mask=x-mask/2;
+			for(y_mask; y_mask<(y+mask/2); y_mask++){
+				for(x_mask; x_mask<(x+mask/2); x_mask++){
+					//encontrar o minimo
+					if(ptr_img[3*x_mask] < menor[0]) menor[0] = ptr_img[3*x_mask];
+					if(ptr_img[3*x_mask+1] < menor[1]) menor[1] = ptr_img[3*x_mask+1];
+					if(ptr_img[3*x_mask+2] < menor[2]) menor[2] = ptr_img[3*x_mask+2];	
+				}
+			}
+			ptr_img2[3*x]=menor[0];
+			ptr_img2[3*x+1]=menor[1];
+			ptr_img2[3*x+2]=menor[2];
+        }
+    }
+	troca(img,img2);
+}
+
+void filtro4(IplImage* img, IplImage* img2){
 	
 }
 
-void filtro2(IplImage* img){
+void filtro5(IplImage* img, IplImage* img2){
 	
 }
 
-void filtro3(IplImage* img){
+void filtro6(IplImage* img, IplImage* img2){
 	
 }
 
-void filtro4(IplImage* img){
-	
-}
-
-void filtro5(IplImage* img){
-	
-}
-
-void filtro6(IplImage* img){
-	
-}
-
-void filtro7(IplImage* img){
-	
-}
-
-void filtro8(IplImage* img){
-	
-}
 
 int main (int argc, char** argv){
     //INICIALIZAÇÕES
     //video inicial
-
+	
     CvCapture* capture = cvCaptureFromAVI("infile.avi");
     //propriedades do video
-    int key = 5;
-    int nFrames = (int)cvGetCaptureProperty(capture,CV_CAP_PROP_FRAME_COUNT);
-    int fps     = (int)cvGetCaptureProperty(capture,CV_CAP_PROP_FPS);
-    int frameH  = (int)cvGetCaptureProperty(capture,CV_CAP_PROP_FRAME_HEIGHT);
-    int frameW  = (int)cvGetCaptureProperty(capture,CV_CAP_PROP_FRAME_WIDTH);
+    int key = 1024;
+    nFrames = (int)cvGetCaptureProperty(capture,CV_CAP_PROP_FRAME_COUNT);
+    fps     = (int)cvGetCaptureProperty(capture,CV_CAP_PROP_FPS);
+    frameH  = (int)cvGetCaptureProperty(capture,CV_CAP_PROP_FRAME_HEIGHT);
+    frameW  = (int)cvGetCaptureProperty(capture,CV_CAP_PROP_FRAME_WIDTH);
     srand(key);
 
     //video final
     CvVideoWriter *writer = cvCreateVideoWriter("out.avi",CV_FOURCC('P','I','M','1'),
                            fps,cvSize(frameW,frameH),1);
     // imagem chave guardar o resultado da operação
-    int fator = 100;
+    //int fator = 100;
     //frameW/5/2;
     //100 é um bom valor
     IplImage* keyImg = cvCreateImage(cvSize(frameW,frameH),IPL_DEPTH_8U,3);
-    for(int y = 0;y < keyImg->height;y++) {
+	IplImage* auxiliarImg = cvCreateImage(cvSize(frameW,frameH),IPL_DEPTH_8U,3);
+    /*for(int y = 0;y < keyImg->height;y++) {
         uchar* ptr_key = (uchar*) (keyImg->imageData + y * keyImg->widthStep);
         for(int x = 0;x < keyImg->width;x++){
              int nRand = aleatorio(key + (x * y))%256;
@@ -95,19 +178,46 @@ int main (int argc, char** argv){
              ptr_key[3 * x + 1] = nRand;
              ptr_key[3 * x + 2] = nRand;
         }
-    }
+    }*/
 
     //tentar or ou and
-    cvShowImage("imagem chave",keyImg);
+    //cvShowImage("imagem chave",keyImg);
 
-
+	printf("%d\n", nFrames);
     //PROCESSAMENTO E GRAVAÇÃO
     IplImage* img;
     cvSetCaptureProperty(capture,CV_CAP_PROP_POS_FRAMES,0);
-    for(int i = 0;i < nFrames - 1;i++){
+    for(int i = 0;i < nFrames-1;i++){
         cvGrabFrame(capture);          // captura imagem
         img = cvRetrieveFrame(capture);  // recupera a imagem capturada
-        //cvShowImage("Video Original",img); //mostra imagem original
+        
+		//gerar imagem aleatoria a cada frame
+		
+		printf("Loop %d\n",i);
+		for(int y = 0;y < keyImg->height;y++) {
+			uchar* ptr_key = (uchar*) (keyImg->imageData + y * keyImg->widthStep);
+			for(int x = 0;x < keyImg->width;x++){
+				int nRand1 = rand()%256;
+				int nRand2 = rand()%256;
+				int nRand3 = rand()%256;
+				//int nRand = aleatorio(key);
+				ptr_key[3 * x]     = nRand1;
+				ptr_key[3 * x + 1] = nRand2;
+				ptr_key[3 * x + 2] = nRand3;
+			}
+		}
+		
+		
+		
+		if(i%2){
+			//filtro1(keyImg,auxiliarImg,3);
+			printf("par\n");
+		} else {
+			//filtro3(keyImg,auxiliarImg,3);
+			printf("impar\n");
+		}
+		
+		//cvShowImage("Video Original",img); //mostra imagem original
         /*
         o seu programa deve aplicar um conjunto de métodos de
         processamento de imagens em cada frame do vídeo.
@@ -156,16 +266,26 @@ int main (int argc, char** argv){
 
         //soma dos frames do video com a imagem chave
         //operação de soma sem utilizar a saturação
-        for(int y=0;y < frameH;y++) {
+        int temp1,temp2,temp3;
+		for(int y=0;y < frameH;y++) {
             uchar* ptr_img = (uchar*)(img->imageData + y * img->widthStep);
             uchar* ptr_key = (uchar*)(keyImg->imageData + y * img->widthStep);
             for(int x=0; x<frameW; x++) {
-                ptr_img[3*x]   = ptr_img[3*x]   + ptr_key[3*x];
-                ptr_img[3*x+1] = ptr_img[3*x+1] + ptr_key[3*x+1];
-                ptr_img[3*x+2] = ptr_img[3*x+2] + ptr_key[3*x+2];
+                temp1 = ptr_img[3*x]   + ptr_key[3*x];
+				temp2 = ptr_img[3*x+1] + ptr_key[3*x+1];
+				temp3 = ptr_img[3*x+2] + ptr_key[3*x+2];
+				
+				if(temp1>255) temp1-=255;
+				if(temp2>255) temp2-=255;
+				if(temp3>255) temp3-=255;
+				
+				ptr_img[3*x]   = temp1;
+                ptr_img[3*x+1] = temp2;
+                ptr_img[3*x+2] = temp3;
             }
         }
-
+		
+		//cvLaplace(img,img,3);
 
         //usar mais algumas operações reversíveis
 
