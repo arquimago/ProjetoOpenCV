@@ -5,15 +5,33 @@ int main (int argc, char** argv)
     //INICIALIZAÇÕES
     //video inicial
 
-    CvCapture* capture = cvCaptureFromAVI("../infile.avi");
+    mode = 0;
+    //1 CODIFICA
+    //0 DECODIFICA
+    char* in;
+    char* out;
+    if (mode==1){
+        in  = "../infile.avi";
+        out = "../out.avi";
+    }
+    else
+    {
+        in  = "../out.avi";
+        out = "../decripted.avi";
+    }
+
+
+    CvCapture* capture = capture = cvCaptureFromAVI(in);
+
     //propriedades do video
     int key = 1024;
     nFrames = (int)cvGetCaptureProperty(capture,CV_CAP_PROP_FRAME_COUNT);
     fps     = (int)cvGetCaptureProperty(capture,CV_CAP_PROP_FPS);
     frameH  = (int)cvGetCaptureProperty(capture,CV_CAP_PROP_FRAME_HEIGHT);
     frameW  = (int)cvGetCaptureProperty(capture,CV_CAP_PROP_FRAME_WIDTH);
+    codec = cvGetCaptureProperty(capture,CV_CAP_PROP_FOURCC);
     //video final
-    CvVideoWriter *writer = cvCreateVideoWriter("../out.avi",CV_FOURCC('P','I','M','1'),
+    CvVideoWriter *writer = cvCreateVideoWriter(out,codec,
                             fps,cvSize(frameW,frameH),1);
     // imagem chave guardar o resultado da operação
     IplImage* keyImg = criarKey(key);
@@ -31,7 +49,7 @@ int main (int argc, char** argv)
     {
         cvGrabFrame(capture);          // captura imagem
         img = cvRetrieveFrame(capture);  // recupera a imagem capturada
-
+        img = prepararImg(img);
         //gerar imagem aleatoria a cada frame
 
         //printf("Loop %d\n",i);
@@ -97,7 +115,7 @@ int main (int argc, char** argv)
         //soma dos frames do video com a imagem chave
         //operação de soma sem utilizar a saturação
 
-        img = somaImg(img,keyImg);
+        img = somaImg(img,keyImg,mode);
 
         //usar mais algumas operações reversíveis
 

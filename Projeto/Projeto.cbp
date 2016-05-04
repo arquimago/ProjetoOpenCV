@@ -95,7 +95,7 @@
 			<Add option="-Wall" />
 		</Compiler>
 		<Unit filename="../conversor.cpp" />
-		<Unit filename="../decodificador.cpp" />
+		<Unit filename="../main.cpp" />
 		<Extensions>
 			<code_completion />
 			<envvars />

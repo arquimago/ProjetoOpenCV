@@ -289,21 +289,21 @@
 1462329699 source:c:\users\icaro\documents\github\projetoopencv\revert.cpp
 	"conversor.cpp"
 
-1462331452 source:c:\users\icaro\documents\github\projetoopencv\conversor.cpp
+1462393643 source:c:\users\icaro\documents\github\projetoopencv\conversor.cpp
 	<opencv2/highgui/highgui.hpp>
 	<opencv2/core/core.hpp>
 	<opencv2/imgproc/imgproc.hpp>
 	<stdio.h>
 
-1462331452 c:\users\icaro\documents\github\projetoopencv\conversor.cpp
+1462393085 c:\users\icaro\documents\github\projetoopencv\conversor.cpp
 	<opencv2/highgui/highgui.hpp>
 	<opencv2/core/core.hpp>
 	<opencv2/imgproc/imgproc.hpp>
 	<stdio.h>
 
-1462332937 source:c:\users\icaro\documents\github\projetoopencv\codificador.cpp
+1462336216 source:c:\users\icaro\documents\github\projetoopencv\codificador.cpp
 	"conversor.cpp"
 
-1462332810 source:c:\users\icaro\documents\github\projetoopencv\decodificador.cpp
+1462336941 source:c:\users\icaro\documents\github\projetoopencv\decodificador.cpp
 	"conversor.cpp"
 

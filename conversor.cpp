@@ -4,8 +4,9 @@
 //#include <time.h>
 #include <stdio.h>
 
-
+static int mode;
 static int nFrames,fps,frameH,frameW;
+static int codec;
 
 static void troca(IplImage* n1, IplImage* n2)
 {
@@ -191,7 +192,7 @@ static IplImage* criarKey (int key){
 }
 
 
-static IplImage* somaImg(IplImage* img,IplImage* keyImg){
+static IplImage* somaImg(IplImage* img,IplImage* keyImg,int mode){
 
         int temp1,temp2,temp3;
         for(int y=0; y < frameH; y++)
@@ -200,10 +201,17 @@ static IplImage* somaImg(IplImage* img,IplImage* keyImg){
             uchar* ptr_key = (uchar*)(keyImg->imageData + y * img->widthStep);
             for(int x=0; x<frameW; x++)
             {
-                temp1 = ptr_img[3*x]   + ptr_key[3*x];
-                temp2 = ptr_img[3*x+1] + ptr_key[3*x+1];
-                temp3 = ptr_img[3*x+2] + ptr_key[3*x+2];
-
+                if (mode==1){
+                    temp1 = ptr_img[3*x]   + 125;
+                    temp2 = ptr_img[3*x+1] + 0;
+                    temp3 = ptr_img[3*x+2] + 0;
+                }
+                else
+                {
+                    temp1 = ptr_img[3*x]   - 125;
+                    temp2 = ptr_img[3*x+1] - 0;
+                    temp3 = ptr_img[3*x+2] - 0;
+                }
                 /*
                 if(temp1>255) temp1-=255;
                 if(temp2>255) temp2-=255;
@@ -221,27 +229,29 @@ static IplImage* somaImg(IplImage* img,IplImage* keyImg){
 
 }
 
-static IplImage* subtracaoImg(IplImage* img,IplImage* keyImg){
 
+static IplImage* prepararImg(IplImage* img){
+
+        IplImage* resultImg = cvCreateImage(cvSize(frameW,frameH),IPL_DEPTH_8U,3);
         int temp1,temp2,temp3;
         for(int y=0; y < frameH; y++)
         {
             uchar* ptr_img = (uchar*)(img->imageData + y * img->widthStep);
-            uchar* ptr_key = (uchar*)(keyImg->imageData + y * img->widthStep);
+            uchar* ptr_resultImg = (uchar*)(resultImg->imageData + y * img->widthStep);
             for(int x=0; x<frameW; x++)
             {
-                temp1 = ptr_img[3*x]   - ptr_key[3*x];
-                temp2 = ptr_img[3*x+1] - ptr_key[3*x+1];
-                temp3 = ptr_img[3*x+2] - ptr_key[3*x+2];
+                temp1 = ptr_img[3*x];
+                temp2 = ptr_img[3*x+1];
+                temp3 = ptr_img[3*x+2];
 
                 /*
                 if(temp1>255) temp1-=255;
                 if(temp2>255) temp2-=255;
                 if(temp3>255) temp3-=255;
                 */
-                ptr_img[3*x]   = temp1;
-                ptr_img[3*x+1] = temp2;
-                ptr_img[3*x+2] = temp3;
+                ptr_resultImg[3*x]   = temp1;
+                ptr_resultImg[3*x+1] = temp2;
+                ptr_resultImg[3*x+2] = temp3;
 
             }
         }
@@ -250,4 +260,3 @@ static IplImage* subtracaoImg(IplImage* img,IplImage* keyImg){
 
 
 }
-
