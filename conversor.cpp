@@ -201,6 +201,7 @@ static IplImage* somaImg(IplImage* img,IplImage* keyImg,int mode){
             uchar* ptr_key = (uchar*)(keyImg->imageData + y * img->widthStep);
             for(int x=0; x<frameW; x++)
             {
+                ///VALORES ALTERADOS PARA TESTE
                 if (mode==1){
                     temp1 = ptr_img[3*x]   + 125;
                     temp2 = ptr_img[3*x+1] + 0;
@@ -231,6 +232,7 @@ static IplImage* somaImg(IplImage* img,IplImage* keyImg,int mode){
 
 
 static IplImage* prepararImg(IplImage* img){
+
 
         IplImage* resultImg = cvCreateImage(cvSize(frameW,frameH),IPL_DEPTH_8U,3);
         int temp1,temp2,temp3;
