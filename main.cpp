@@ -11,16 +11,15 @@ int main (int argc, char** argv)
     char* in;
     char* out;
 
-    if (mode==1){
-        in  = "../infile.avi";
-        out = "../out.avi";
+    if (mode==0){
+        in  = "infile.avi";
+        out = "out.avi";
     }
     else
     {
-        in  = "../out.avi";
-        out = "../decripted.avi";
+        in  = "out.avi";
+        out = "decripted.avi";
     }
-
 
 
     //video final
@@ -32,21 +31,21 @@ int main (int argc, char** argv)
     frameH  = (int)cvGetCaptureProperty(capture,CV_CAP_PROP_FRAME_HEIGHT);
     frameW  = (int)cvGetCaptureProperty(capture,CV_CAP_PROP_FRAME_WIDTH);
     codec = -1;
-
+	
+	img2 = cvCreateImage(cvSize(frameW,frameH),IPL_DEPTH_8U,3);
 
     CvVideoWriter *writer = cvCreateVideoWriter(out,codec,
                             fps,cvSize(frameW,frameH),1);
 
-    IplImage* keyImg = criarKey(key);
-    IplImage* auxiliarImg = cvCreateImage(cvSize(frameW,frameH),IPL_DEPTH_8U,3);
-    cvShowImage("imagem chave",keyImg);
 
     //PROCESSAMENTO E GRAVAÇÃO
     IplImage* img;
     cvSetCaptureProperty(capture,CV_CAP_PROP_POS_FRAMES,0);
     for(int i = 0; i < nFrames-1; i++)
     {
-        cvGrabFrame(capture);          // captura imagem
+        IplImage* keyImg = criarKey(key);
+		
+		cvGrabFrame(capture);          // captura imagem
         img = cvRetrieveFrame(capture);  // recupera a imagem capturada
 
 
@@ -112,17 +111,17 @@ int main (int argc, char** argv)
         //operação de soma sem utilizar a saturação
 
         img = somaImg(img,keyImg,mode);
+		//filtroFlip(img);
 
         //usar mais algumas operações reversíveis
 
 
-        cvShowImage("Video modificado",img); //mostra imagem modificada
+        //cvShowImage("Video modificado",img); //mostra imagem modificada
         cvWriteFrame(writer,img);      // grava imagem no video de saída
         cvWaitKey(1);           // espera 1ms
     }
 
     //LIBERAÇÃO DE RECURSOS
-
 
     cvReleaseCapture(&capture);
     cvReleaseVideoWriter(&writer);

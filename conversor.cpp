@@ -7,6 +7,7 @@
 static int mode;
 static int nFrames,fps,frameH,frameW;
 static int codec;
+static IplImage* img2;
 
 static void troca(IplImage* n1, IplImage* n2)
 {
@@ -49,9 +50,8 @@ static int aleatorio(int seed)
     return retorno;
 }
 
-static void filtro1(IplImage* img, IplImage* img2, int mask)
+static void filtroMax(IplImage* img, int mask)
 {
-    //max
     for(int y=0; y < frameH; y++)
     {
         if(y-mask/2<=0) continue;
@@ -85,37 +85,30 @@ static void filtro1(IplImage* img, IplImage* img2, int mask)
     troca(img,img2);
 }
 
-static void filtro2(IplImage* img, IplImage* img2, int mask)
+static void filtroFlip(IplImage* img)
 {
-    //soma os pixels em volta (mascara)
+	int constante = 42;
+	int linha, coluna;
     for(int y=0; y < frameH; y++)
-    {
-        if(y-mask/2<=0) continue;
-        uchar* ptr_img = (uchar*)(img->imageData + y * img->widthStep);
-        uchar* ptr_img2 = (uchar*)(img2->imageData + y * img->widthStep);
+    { 
+		linha = y * img->widthStep;
+		uchar* ptr_img = (uchar*)(img->imageData + linha);
+		if(y%2){
+			linha=(linha+y*constante)%frameH;	
+		} else {
+			linha=(linha-y*constante)%frameH;	
+		}
+        uchar* ptr_img2 = (uchar*)(img2->imageData + linha);
         for(int x=0; x<frameW; x++)
         {
-            if(x-mask/2<=0) continue;
-            uchar maior[3];
-            maior[0] = 0;
-            maior[1] = 0;
-            maior[2] = 0;
-            int y_mask, x_mask;
-            y_mask=y-mask/2;
-            x_mask=x-mask/2;
-            for(y_mask; y_mask<(y+mask/2); y_mask++)
-            {
-                for(x_mask; x_mask<(x+mask/2); x_mask++)
-                {
-                    //encontrar o maximo
-                    maior[0]+= ptr_img[3*x_mask];
-                    maior[1]+= ptr_img[3*x_mask+1];
-                    maior[2]+= ptr_img[3*x_mask+2];
-                }
-            }
-            ptr_img2[3*x]=maior[0];
-            ptr_img2[3*x+1]=maior[1];
-            ptr_img2[3*x+2]=maior[2];
+			if(x%2){
+				coluna = (x+constante)%frameW;
+			} else {
+				coluna = (x-constante)%frameW;
+			}
+			ptr_img2[3*x]   = ptr_img[3*coluna];
+            ptr_img2[3*x+1] = ptr_img[3*coluna+1];
+            ptr_img2[3*x+2] = ptr_img[3*coluna+2];
         }
     }
     troca(img,img2);
@@ -123,38 +116,7 @@ static void filtro2(IplImage* img, IplImage* img2, int mask)
 
 static void filtro3(IplImage* img, IplImage* img2,int mask)
 {
-    //min
-    for(int y=0; y < frameH; y++)
-    {
-        if(y-mask/2<=0) continue;
-        uchar* ptr_img = (uchar*)(img->imageData + y * img->widthStep);
-        uchar* ptr_img2 = (uchar*)(img2->imageData + y * img->widthStep);
-        for(int x=0; x<frameW; x++)
-        {
-            if(x-mask/2<=0) continue;
-            uchar menor[3];
-            menor[0] = 255;
-            menor[1] = 255;
-            menor[2] = 255;
-            int y_mask, x_mask;
-            y_mask=y-mask/2;
-            x_mask=x-mask/2;
-            for(y_mask; y_mask<(y+mask/2); y_mask++)
-            {
-                for(x_mask; x_mask<(x+mask/2); x_mask++)
-                {
-                    //encontrar o minimo
-                    if(ptr_img[3*x_mask] < menor[0]) menor[0] = ptr_img[3*x_mask];
-                    if(ptr_img[3*x_mask+1] < menor[1]) menor[1] = ptr_img[3*x_mask+1];
-                    if(ptr_img[3*x_mask+2] < menor[2]) menor[2] = ptr_img[3*x_mask+2];
-                }
-            }
-            ptr_img2[3*x]=menor[0];
-            ptr_img2[3*x+1]=menor[1];
-            ptr_img2[3*x+2]=menor[2];
-        }
-    }
-    troca(img,img2);
+    
 }
 
 static void filtro4(IplImage* img, IplImage* img2)
@@ -205,13 +167,13 @@ static IplImage* somaImg(IplImage* img,IplImage* keyImg,int mode){
                 if (mode==1){
                     temp1 = ptr_img[3*x]   + ptr_key[3*x];
                     temp2 = ptr_img[3*x+1] + ptr_key[3*x+1];
-                    temp3 = ptr_img[3*x+2] + ptr_key[3*x+1];
+                    temp3 = ptr_img[3*x+2] + ptr_key[3*x+2];
                 }
                 else
                 {
                     temp1 = ptr_img[3*x]   - ptr_key[3*x];
                     temp2 = ptr_img[3*x+1] - ptr_key[3*x+1];
-                    temp3 = ptr_img[3*x+2] - ptr_key[3*x+1];
+                    temp3 = ptr_img[3*x+2] - ptr_key[3*x+2];
                 }
                 /*
                 if(temp1>255) temp1-=255;
