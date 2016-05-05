@@ -203,15 +203,15 @@ static IplImage* somaImg(IplImage* img,IplImage* keyImg,int mode){
             {
                 ///VALORES ALTERADOS PARA TESTE
                 if (mode==1){
-                    temp1 = ptr_img[3*x]   + 125;
-                    temp2 = ptr_img[3*x+1] + 0;
-                    temp3 = ptr_img[3*x+2] + 0;
+                    temp1 = ptr_img[3*x]   + ptr_key[3*x];
+                    temp2 = ptr_img[3*x+1] + ptr_key[3*x+1];
+                    temp3 = ptr_img[3*x+2] + ptr_key[3*x+1];
                 }
                 else
                 {
-                    temp1 = ptr_img[3*x]   - 125;
-                    temp2 = ptr_img[3*x+1] - 0;
-                    temp3 = ptr_img[3*x+2] - 0;
+                    temp1 = ptr_img[3*x]   - ptr_key[3*x];
+                    temp2 = ptr_img[3*x+1] - ptr_key[3*x+1];
+                    temp3 = ptr_img[3*x+2] - ptr_key[3*x+1];
                 }
                 /*
                 if(temp1>255) temp1-=255;
