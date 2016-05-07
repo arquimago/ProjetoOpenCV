@@ -15,7 +15,7 @@ static void troca(IplImage* n1, IplImage* n2)
     return;
 }
 
-
+//função aleatória implementada pelo grupo. não foi utilizada, mas funciona e dá o mesmo resultado independente de plataforma
 static int aleatorio(int seed)
 {
     int maxI =1000;
@@ -91,7 +91,7 @@ static IplImage* somaImg(IplImage* img,IplImage* keyImg,int mode){
                     temp2 = ptr_img[3*x+1] - ptr_key[3*x+1];
                     temp3 = ptr_img[3*x+2] - ptr_key[3*x+2];
                 }
-                
+
                 ptr_img[3*x]   = temp1;
                 ptr_img[3*x+1] = temp2;
                 ptr_img[3*x+2] = temp3;
