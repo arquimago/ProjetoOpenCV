@@ -14,15 +14,15 @@ int main (int argc, char** argv)
      char* out;
 
      in = argv[1];
-     out = argv[2];
+	out = argv[2];
 	
-    printf("Modos Disponíveis:\n (0)Criptografar\n (1)Descriptografar\n (2)Melhorar Imagem Ruidosa\n (3)Encontrar objeto em imagem Ruidosa\n\n		Digite o numero do modo escolhido: ");
-    scanf("%d", &mode);
-    if(mode>3||mode<0) return 0;
-    if(mode==0||mode==1){
-	printf("Digite a chave de criptografia: ");
-	scanf("%d", &key);
-    }
+	printf(" Modos Disponíveis:\n (0)Criptografar\n (1)Descriptografar\n (2)Melhorar Imagem Ruidosa\n (3)Encontrar objeto em imagem Ruidosa\n\n  Digite o numero do modo escolhido: ");
+	scanf("%d", &mode);
+	if(mode>3||mode<0) return 0;
+	if(mode==0||mode==1){
+		printf("  Digite a chave de criptografia: ");
+		scanf("%d", &key);
+	}
 
 
     //video final
@@ -55,17 +55,22 @@ int main (int argc, char** argv)
 
         try
         {
-            if(mode == 1 || mode == 0)
-            {
-                IplImage* keyImg = criarKey(key);
-                //soma dos frames do video com a imagem chave
-                //operação de soma sem utilizar a saturação
-                cvNot(img, img);
-                img = somaImg(img,keyImg,mode);
-                cvFlip(img,img,-1);
-            }
-            else if (mode == 2)
-            {
+            if(mode==0)
+	    {
+        	//soma dos frames do video com a imagem chave
+		//operação de soma sem utilizar a saturação
+		cvNot(img, img);
+		img = somaImg(img,keyImg,mode);
+		cvFlip(img,img,-1);
+             }
+	     else if(mode==1)
+	     {
+		cvFlip(img,img,-1);
+		img = somaImg(img,keyImg,mode);
+		cvNot(img, img);
+	      }
+              else if (mode == 2)
+              {
                 IplImage* img2 = cvCreateImage(cvSize(frameW,frameH),IPL_DEPTH_8U,3);
                 //fechar pontos negros
                 cvDilate(img,img, NULL, 1);
