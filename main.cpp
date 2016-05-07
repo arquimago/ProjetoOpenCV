@@ -5,14 +5,15 @@ int main (int argc, char** argv)
     //INICIALIZAÇÕES
     //video inicial
 
-    mode = 2;
+    mode = 3;
     //0 CODIFICA
     //1 DECODIFICA
-	//2 MELHORA
+    //2 RABISCO
+    //3 BORDAS
     char* in;
     char* out;
 
-    if (mode==0||mode==2){
+    if (mode==0||mode==2 || mode ==3||mode == 4){
         in  = "infile.avi";
         out = "out.avi";
     }
@@ -38,9 +39,9 @@ int main (int argc, char** argv)
 
 
     //PROCESSAMENTO E GRAVAÇÃO
-    IplImage* img,img2;
-	
-	img2 = cvCreateImage(cvSize(frameW,frameH),IPL_DEPTH_8U,3);
+    IplImage* img;
+	IplImage* img2 = cvCreateImage(cvSize(frameW,frameH),IPL_DEPTH_8U,3);
+	IplImage* img3 = cvCreateImage(cvSize(frameW,frameH),IPL_DEPTH_8U,3);
 	
     cvSetCaptureProperty(capture,CV_CAP_PROP_POS_FRAMES,0);
     for(int i = 0; i < nFrames-1; i++)
@@ -62,27 +63,29 @@ int main (int argc, char** argv)
         }
         else if (mode == 2)
         {
-			cvSmooth(img, img, CV_MEDIAN, 5);
-			
-			cvSobel(img,img2,1,1,3);
-			img = somaImg(img,img2,1);
+		cvSmooth(img, img, CV_MEDIAN, 5);
+		cvLaplace(img,img,3);
 						
-			cvLaplace(img,img2,3);
-			img = somaImg(img,img2,1);
-			
-			//Abertura
-			cvErode(img,img, NULL, 5 );
-			cvDilate(img,img,NULL,5);
-			
-			//Fechamento
-			cvDilate(img,img,NULL,5);
-			cvErode(img,img, NULL, 5);
-			
+		cvNot(img, img);
+					
+		//Abertura
+		cvErode(img,img, NULL,1);
+		cvDilate(img,img,NULL,1);
         }
-		else
-		{
-			break;
-		}
+	else if (mode == 3)
+	{
+		cvErode(img,img2,NULL,1);
+		img = somaImg(img,img2,0);
+		
+	}
+	else if (mode == 4){
+		cvSobel(img,img2,1,2,1);
+		img = somaImg(img,img2,0);
+	}
+	else
+	{
+		break;
+	}
 
         //cvShowImage("Video Original",img); //mostra imagem original
         /*
@@ -110,7 +113,7 @@ int main (int argc, char** argv)
         http://docs.opencv.org/2.4/modules/core/doc/operations_on_arrays.html
         http://docs.opencv.org/2.4/modules/core/doc/operations_on_arrays.html
 
-        cvSobel(img,img,1,1,3);
+        cvSobel(img,img,1,2,1);
 		cvLaplace(img,img,3);
         cvDilate(img,img,NULL,5);
         cvErode(img,img, NULL, 5 );
@@ -145,8 +148,3 @@ int main (int argc, char** argv)
     cvReleaseVideoWriter(&writer);
     return 0;
 }
-/*
-procurar
-espelhamento
-shuffle
-*/
