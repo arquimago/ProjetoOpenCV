@@ -8,12 +8,12 @@ int main (int argc, char** argv)
     mode = 3;
     //0 CODIFICA
     //1 DECODIFICA
-    //2 RABISCO
-    //3 BORDAS
+    //2 MELHORAMENTO DE IMAGEM RUIDOSA
+    //3 IDENTIFICAÇÃO DE OBJETOS EM IMAGEM RUIDOSA
     char* in;
     char* out;
 
-    if (mode==0||mode==2 || mode ==3||mode == 4){
+    if (mode==0||mode==2 ||mode ==3){
         in  = "infile.avi";
         out = "out.avi";
     }
@@ -59,33 +59,31 @@ int main (int argc, char** argv)
 			cvNot(img, img);
 			img = somaImg(img,keyImg,mode);
 			cvFlip(img,img,-1);
-			
         }
         else if (mode == 2)
         {
-		cvSmooth(img, img, CV_MEDIAN, 5);
-		cvLaplace(img,img,3);
-						
-		cvNot(img, img);
-					
-		//Abertura
-		cvErode(img,img, NULL,1);
-		cvDilate(img,img,NULL,1);
+            //retira ruidos
+            cvSmooth(img, img, CV_MEDIAN,5);
+            //isolar bordas
+            cvLaplace(img,img,3);
+            //complementa para melhorar visualização
+            cvNot(img,img);
+            //engorda bordas com erosão
+            cvErode(img,img, NULL,1);
+            cvErode(img,img, NULL,1);
         }
-	else if (mode == 3)
-	{
-		cvErode(img,img2,NULL,1);
-		img = somaImg(img,img2,0);
-		
+	else if(mode== 3){
+            IplImage* img2 = cvCreateImage(cvSize(frameW,frameH),IPL_DEPTH_8U,3);
+            //fechar pontos negros
+			cvDilate(img,img, NULL, 1);
+			cvErode(img,img, NULL, 1);
+			//realçar bordas
+			cvSobel(img,img2,1,1,3);
+            cvAdd(img,img2,img);
+            //retirar ruidos
+            cvSmooth(img,img,CV_MEDIAN,5);
 	}
-	else if (mode == 4){
-		cvSobel(img,img2,1,2,1);
-		img = somaImg(img,img2,0);
-	}
-	else
-	{
-		break;
-	}
+	else break;
 
         //cvShowImage("Video Original",img); //mostra imagem original
         /*
