@@ -62,17 +62,6 @@ int main (int argc, char** argv)
         }
         else if (mode == 2)
         {
-            //retira ruidos
-            cvSmooth(img, img, CV_MEDIAN,5);
-            //isolar bordas
-            cvLaplace(img,img,3);
-            //complementa para melhorar visualização
-            cvNot(img,img);
-            //engorda bordas com erosão
-            cvErode(img,img, NULL,1);
-            cvErode(img,img, NULL,1);
-        }
-	else if(mode== 3){
             IplImage* img2 = cvCreateImage(cvSize(frameW,frameH),IPL_DEPTH_8U,3);
             //fechar pontos negros
 			cvDilate(img,img, NULL, 1);
@@ -82,7 +71,18 @@ int main (int argc, char** argv)
             cvAdd(img,img2,img);
             //retirar ruidos
             cvSmooth(img,img,CV_MEDIAN,5);
-	}
+        }
+	else if(mode== 3){
+            //retira ruidos
+            cvSmooth(img, img, CV_MEDIAN,5);
+            //isolar bordas
+            cvLaplace(img,img,3);
+            //complementa para melhorar visualização
+            cvNot(img,img);
+            //engorda bordas com erosão
+            cvErode(img,img, NULL,1);
+            cvErode(img,img, NULL,1);
+		}
 	else break;
 
         //cvShowImage("Video Original",img); //mostra imagem original
