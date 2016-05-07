@@ -7,6 +7,15 @@ static int mode;
 static int nFrames,fps,frameH,frameW;
 static int codec;
 
+static void troca(IplImage* n1, IplImage* n2)
+{
+    IplImage temp = *n1;
+    *n1 = *n2;
+    *n2 = temp;
+    return;
+}
+
+
 static int aleatorio(int seed)
 {
     int maxI =1000;
@@ -93,4 +102,39 @@ static IplImage* somaImg(IplImage* img,IplImage* keyImg,int mode){
         return img;
 
 
+}
+
+static void filtroMax(IplImage* img,IplImage* img2, int mask)
+{
+    for(int y=0; y < frameH; y++)
+    {
+        if(y-mask/2<=0) continue;
+        uchar* ptr_img = (uchar*)(img->imageData + y * img->widthStep);
+        uchar* ptr_img2 = (uchar*)(img2->imageData + y * img->widthStep);
+        for(int x=0; x<frameW; x++)
+        {
+            if(x-mask/2<=0) continue;
+            uchar maior[3];
+            maior[0] = 0;
+            maior[1] = 0;
+            maior[2] = 0;
+            int y_mask, x_mask;
+            y_mask=y-mask/2;
+            x_mask=x-mask/2;
+            for(y_mask; y_mask<(y+mask/2); y_mask++)
+            {
+                for(x_mask; x_mask<(x+mask/2); x_mask++)
+                {
+                    //encontrar o maximo
+                    if(ptr_img[3*x_mask] > maior[0]) maior[0] = ptr_img[3*x_mask];
+                    if(ptr_img[3*x_mask+1] > maior[1]) maior[1] = ptr_img[3*x_mask+1];
+                    if(ptr_img[3*x_mask+2] > maior[2]) maior[2] = ptr_img[3*x_mask+2];
+                }
+            }
+            ptr_img2[3*x]=maior[0];
+            ptr_img2[3*x+1]=maior[1];
+            ptr_img2[3*x+2]=maior[2];
+        }
+    }
+    //troca(img,img2);
 }
