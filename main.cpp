@@ -2,32 +2,38 @@
 
 int main (int argc, char** argv)
 {
-    //INICIALIZAÇÕES
-    //video inicial
+     //INICIALIZAÇÕES
+     //video inicial
+     int key = 1024;
+     mode = 3;
+     //0 CODIFICA
+     //1 DECODIFICA
+     //2 MELHORAMENTO DE IMAGEM RUIDOSA
+     //3 IDENTIFICAÇÃO DE OBJETOS EM IMAGEM RUIDOSA
+     char* in;
+     char* out;
 
-    mode = 3;
-    //0 CODIFICA
-    //1 DECODIFICA
-    //2 MELHORAMENTO DE IMAGEM RUIDOSA
-    //3 IDENTIFICAÇÃO DE OBJETOS EM IMAGEM RUIDOSA
-    char* in;
-    char* out;
-
-    if (mode==0||mode==2 ||mode ==3){
-        in  = "infile.avi";
-        out = "out.avi";
-    }
-    else
-    {
-        in  = "out.avi";
-        out = "decripted.avi";
+     in = argv[1];
+     out = argv[2];
+	
+     printf("Modos Disponíveis:\n 
+	(0)Criptografar\n
+	(1)Descriptografar\n
+	(2)Melhorar Imagem Ruidosa\n
+	(3)Encontrar objeto em imagem Ruidosa\n\n
+	Digite o numero do modo escolhido:");
+    scanf("%d", &mode);
+    if(mode>3||mode<0) return 0;
+    if(mode==0||mode==1){
+	printf("Digite a chave de criptografia: ");
+	scanf("%d", &key);
     }
 
 
     //video final
     CvCapture* capture = cvCaptureFromAVI(in);
     //propriedades do video
-    int key = 1024;
+  
     nFrames = (int)cvGetCaptureProperty(capture,CV_CAP_PROP_FRAME_COUNT);
     fps     = (int)cvGetCaptureProperty(capture,CV_CAP_PROP_FPS);
     frameH  = (int)cvGetCaptureProperty(capture,CV_CAP_PROP_FRAME_HEIGHT);
