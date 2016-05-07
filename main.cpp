@@ -5,13 +5,14 @@ int main (int argc, char** argv)
     //INICIALIZAÇÕES
     //video inicial
 
-    mode = 0;
-    //1 CODIFICA
-    //0 DECODIFICA
+    mode = 2;
+    //0 CODIFICA
+    //1 DECODIFICA
+	//2 MELHORA
     char* in;
     char* out;
 
-    if (mode==0){
+    if (mode==0||mode==2){
         in  = "infile.avi";
         out = "out.avi";
     }
@@ -31,15 +32,16 @@ int main (int argc, char** argv)
     frameH  = (int)cvGetCaptureProperty(capture,CV_CAP_PROP_FRAME_HEIGHT);
     frameW  = (int)cvGetCaptureProperty(capture,CV_CAP_PROP_FRAME_WIDTH);
     codec = -1;
-	
-	img2 = cvCreateImage(cvSize(frameW,frameH),IPL_DEPTH_8U,3);
 
     CvVideoWriter *writer = cvCreateVideoWriter(out,codec,
                             fps,cvSize(frameW,frameH),1);
 
 
     //PROCESSAMENTO E GRAVAÇÃO
-    IplImage* img;
+    IplImage* img,img2;
+	
+	img2 = cvCreateImage(cvSize(frameW,frameH),IPL_DEPTH_8U,3);
+	
     cvSetCaptureProperty(capture,CV_CAP_PROP_POS_FRAMES,0);
     for(int i = 0; i < nFrames-1; i++)
     {
@@ -49,18 +51,40 @@ int main (int argc, char** argv)
         img = cvRetrieveFrame(capture);  // recupera a imagem capturada
 
 
-        if(i%2)
+        if(mode==1||mode==0)
         {
-            //filtro1(keyImg,auxiliarImg,3);
-            //printf("par\n");
+            //soma dos frames do video com a imagem chave
+			//operação de soma sem utilizar a saturação
+			cvNot(img, img);
+			img = somaImg(img,keyImg,mode);
+			cvFlip(img,img,-1);
+			
         }
-        else
+        else if (mode == 2)
         {
-            //filtro3(keyImg,auxiliarImg,3);
-            //printf("impar\n");
+			cvSmooth(img, img, CV_MEDIAN, 5);
+			
+			cvSobel(img,img2,1,1,3);
+			img = somaImg(img,img2,1);
+						
+			cvLaplace(img,img2,3);
+			img = somaImg(img,img2,1);
+			
+			//Abertura
+			cvErode(img,img, NULL, 5 );
+			cvDilate(img,img,NULL,5);
+			
+			//Fechamento
+			cvDilate(img,img,NULL,5);
+			cvErode(img,img, NULL, 5);
+			
         }
+		else
+		{
+			break;
+		}
 
-        cvShowImage("Video Original",img); //mostra imagem original
+        //cvShowImage("Video Original",img); //mostra imagem original
         /*
         o seu programa deve aplicar um conjunto de métodos de
         processamento de imagens em cada frame do vídeo.
@@ -87,10 +111,13 @@ int main (int argc, char** argv)
         http://docs.opencv.org/2.4/modules/core/doc/operations_on_arrays.html
 
         cvSobel(img,img,1,1,3);
-        cvSmooth(img, img, CV_GAUSSIAN, 9);
-        cvLaplace(img,img,3);
+		cvLaplace(img,img,3);
         cvDilate(img,img,NULL,5);
         cvErode(img,img, NULL, 5 );
+		cvFlip(img,img,-1);
+        cvNot(img, img);
+		cvSmooth(img, img, CV_MEDIAN, 5);
+        
         cvCvtColor(img, img, CV_BGR2Luv);
         cvThreshold(img,img, 30, 700, 1);
         cvAbsDiff(img, img, img);
@@ -103,20 +130,11 @@ int main (int argc, char** argv)
         cvMul(img,img,img,1);
 
         reversíveis
-        cvFlip(img,img,-1);
-        cvNot(img, img);
+        
         */
 
-        //soma dos frames do video com a imagem chave
-        //operação de soma sem utilizar a saturação
-
-        img = somaImg(img,keyImg,mode);
-		//filtroFlip(img);
-
-        //usar mais algumas operações reversíveis
-
-
-        //cvShowImage("Video modificado",img); //mostra imagem modificada
+        
+		//cvShowImage("Video modificado",img); //mostra imagem modificada
         cvWriteFrame(writer,img);      // grava imagem no video de saída
         cvWaitKey(1);           // espera 1ms
     }
