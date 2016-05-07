@@ -2,20 +2,21 @@
 
 int main (int argc, char** argv)
 {
-     //INICIALIZAÇÕES
-     //video inicial
-     int key = 1024;
-     mode = 3;
-     //0 CODIFICA
-     //1 DECODIFICA
-     //2 MELHORAMENTO DE IMAGEM RUIDOSA
-     //3 IDENTIFICAÇÃO DE OBJETOS EM IMAGEM RUIDOSA
-     char* in;
-     char* out;
+    //INICIALIZAÇÕES
+    //video inicial
+    int key = 1024;
+    mode = 0;
+    //0 CODIFICA
+    //1 DECODIFICA
+    //2 MELHORAMENTO DE IMAGEM RUIDOSA
+    //3 IDENTIFICAÇÃO DE OBJETOS EM IMAGEM RUIDOSA
+    char* in;
+    char* out;
 
-     in = argv[1];
-	out = argv[2];
-	
+    in = argv[1];
+    out = argv[2];
+
+    //menu de opções
 	printf(" Modos Disponíveis:\n (0)Criptografar\n (1)Descriptografar\n (2)Melhorar Imagem Ruidosa\n (3)Encontrar objeto em imagem Ruidosa\n\n  Digite o numero do modo escolhido: ");
 	scanf("%d", &mode);
 	if(mode>3||mode<0) return 0;
@@ -25,49 +26,52 @@ int main (int argc, char** argv)
 	}
 
 
-    //video final
+    //video de leitura
     CvCapture* capture = cvCaptureFromAVI(in);
     //propriedades do video
-  
     nFrames = (int)cvGetCaptureProperty(capture,CV_CAP_PROP_FRAME_COUNT);
     fps     = (int)cvGetCaptureProperty(capture,CV_CAP_PROP_FPS);
     frameH  = (int)cvGetCaptureProperty(capture,CV_CAP_PROP_FRAME_HEIGHT);
     frameW  = (int)cvGetCaptureProperty(capture,CV_CAP_PROP_FRAME_WIDTH);
     codec = -1;
-
+    //video final
     CvVideoWriter *writer = cvCreateVideoWriter(out,codec,
                             fps,cvSize(frameW,frameH),1);
 
 
     //PROCESSAMENTO E GRAVAÇÃO
-    IplImage* img;
-	IplImage* img2 = cvCreateImage(cvSize(frameW,frameH),IPL_DEPTH_8U,3);
-	IplImage* img3 = cvCreateImage(cvSize(frameW,frameH),IPL_DEPTH_8U,3);
-	
     cvSetCaptureProperty(capture,CV_CAP_PROP_POS_FRAMES,0);
     for(int i = 0; i < nFrames-1; i++)
     {
+        //inicializa imagem com white noise aleatório
         IplImage* keyImg = criarKey(key);
-		
+        IplImage* img;
+
 		cvGrabFrame(capture);          // captura imagem
         img = cvRetrieveFrame(capture);  // recupera a imagem capturada
 
-
+        //cvShowImage("Video Original",img); //mostra imagem original
         try
         {
             if(mode==0)
 	    {
-        	//soma dos frames do video com a imagem chave
-		//operação de soma sem utilizar a saturação
-		cvNot(img, img);
-		img = somaImg(img,keyImg,mode);
-		cvFlip(img,img,-1);
+             //complementa a imagem
+             cvNot(img, img);
+             //soma dos frames do video com a imagem chave
+             //operação de soma sem utilizar a saturação
+             img = somaImg(img,keyImg,mode);
+             //gira a imagem nos dois eixos
+             cvFlip(img,img,-1);
              }
 	     else if(mode==1)
 	     {
-		cvFlip(img,img,-1);
-		img = somaImg(img,keyImg,mode);
-		cvNot(img, img);
+             //gira a imagem nos dois eixos
+	         cvFlip(img,img,-1);
+             //soma dos frames do video com a imagem chave
+             //operação de soma sem utilizar a saturação
+             img = somaImg(img,keyImg,mode);
+             cvNot(img, img);
+             //complementa a imagem
 	      }
               else if (mode == 2)
               {
@@ -83,9 +87,6 @@ int main (int argc, char** argv)
             }
             else if(mode== 3)
             {
-
-
-
                 cvSmooth(img, img, CV_MEDIAN,5);
                 //isolar bordas
                 cvLaplace(img,img,3);
@@ -93,11 +94,8 @@ int main (int argc, char** argv)
                 cvNot(img,img);
 
                 //engorda bordas com erosão
-                ///erros aki iteração 300  frame defeituoso
-
 
                 cvErode(img,img, NULL,1);
-                printf("%d   %d  INICIO \n",nFrames,i);
                 cvErode(img,img, NULL,1);
 
 
@@ -105,56 +103,7 @@ int main (int argc, char** argv)
             else break;
         }catch(cv::Exception e){continue;}
 
-        //cvShowImage("Video Original",img); //mostra imagem original
-        /*
-        o seu programa deve aplicar um conjunto de métodos de
-        processamento de imagens em cada frame do vídeo.
-        A aplicação de cada método deve obrigatoriamente modificar a imagem e ter relevância no processo. O conjunto
-        de métodos aplicados deve resultar em um efeito coerente no vídeo final.
 
-        4 métodos diferentes devem ser utilizados
-
-        aplicar, no mínimo:
-        - Três operadores pontuais ou aritméticos;
-        - Cinco filtros espaciais ou morfológicos.
-
-
-
-        processo com 4 ou mais filtros: esconder informação e extrair informação
-        (um programa para esconder informação, embaralhando a imagem)
-        (outro para extrair essa informação pelo processo inverso)
-        (caso seja usado outro processo para tentar extrair informação, a imagem não deve ser entendível)
-
-        algumas operações
-        http://docs.opencv.org/2.4/modules/imgproc/doc/miscellaneous_transformations.html
-        http://docs.opencv.org/2.4/modules/imgproc/doc/filtering.html
-        http://docs.opencv.org/2.4/modules/core/doc/operations_on_arrays.html
-        http://docs.opencv.org/2.4/modules/core/doc/operations_on_arrays.html
-
-        cvSobel(img,img,1,2,1);
-		cvLaplace(img,img,3);
-        cvDilate(img,img,NULL,5);
-        cvErode(img,img, NULL, 5 );
-		cvFlip(img,img,-1);
-        cvNot(img, img);
-		cvSmooth(img, img, CV_MEDIAN, 5);
-        
-        cvCvtColor(img, img, CV_BGR2Luv);
-        cvThreshold(img,img, 30, 700, 1);
-        cvAbsDiff(img, img, img);
-        cvAdd(img,img, img);
-        cvAnd(img,img,img);
-        cvOr(img,img,img);
-        cvXor(img,img,img);
-        cvConvertScaleAbs(img,img,3,4);
-        cvDiv(img,img,img,1);
-        cvMul(img,img,img,1);
-
-        reversíveis
-        
-        */
-
-        
 		//cvShowImage("Video modificado",img); //mostra imagem modificada
         cvWriteFrame(writer,img);      // grava imagem no video de saída
         cvWaitKey(1);           // espera 1ms
