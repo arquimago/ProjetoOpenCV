@@ -52,38 +52,52 @@ int main (int argc, char** argv)
         img = cvRetrieveFrame(capture);  // recupera a imagem capturada
 
 
-        if(mode==1||mode==0)
+        try
         {
-            //soma dos frames do video com a imagem chave
-			//operação de soma sem utilizar a saturação
-			cvNot(img, img);
-			img = somaImg(img,keyImg,mode);
-			cvFlip(img,img,-1);
-        }
-        else if (mode == 2)
-        {
-            IplImage* img2 = cvCreateImage(cvSize(frameW,frameH),IPL_DEPTH_8U,3);
-            //fechar pontos negros
-			cvDilate(img,img, NULL, 1);
-			cvErode(img,img, NULL, 1);
-			//realçar bordas
-			cvSobel(img,img2,1,1,3);
-            cvAdd(img,img2,img);
-            //retirar ruidos
-            cvSmooth(img,img,CV_MEDIAN,5);
-        }
-	else if(mode== 3){
-            //retira ruidos
-            cvSmooth(img, img, CV_MEDIAN,5);
-            //isolar bordas
-            cvLaplace(img,img,3);
-            //complementa para melhorar visualização
-            cvNot(img,img);
-            //engorda bordas com erosão
-            cvErode(img,img, NULL,1);
-            cvErode(img,img, NULL,1);
-		}
-	else break;
+            if(mode == 1 || mode == 0)
+            {
+                IplImage* keyImg = criarKey(key);
+                //soma dos frames do video com a imagem chave
+                //operação de soma sem utilizar a saturação
+                cvNot(img, img);
+                img = somaImg(img,keyImg,mode);
+                cvFlip(img,img,-1);
+            }
+            else if (mode == 2)
+            {
+                IplImage* img2 = cvCreateImage(cvSize(frameW,frameH),IPL_DEPTH_8U,3);
+                //fechar pontos negros
+                cvDilate(img,img, NULL, 1);
+                cvErode(img,img, NULL, 1);
+                //realçar bordas
+                cvSobel(img,img2,1,1,3);
+                cvAdd(img,img2,img);
+                //retirar ruidos
+                cvSmooth(img,img,CV_MEDIAN,5);
+            }
+            else if(mode== 3)
+            {
+
+
+
+                cvSmooth(img, img, CV_MEDIAN,5);
+                //isolar bordas
+                cvLaplace(img,img,3);
+                //complementa para melhorar visualização
+                cvNot(img,img);
+
+                //engorda bordas com erosão
+                ///erros aki iteração 300  frame defeituoso
+
+
+                cvErode(img,img, NULL,1);
+                printf("%d   %d  INICIO \n",nFrames,i);
+                cvErode(img,img, NULL,1);
+
+
+            }
+            else break;
+        }catch(cv::Exception e){continue;}
 
         //cvShowImage("Video Original",img); //mostra imagem original
         /*
