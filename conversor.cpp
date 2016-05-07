@@ -80,7 +80,7 @@ static IplImage* somaImg(IplImage* img,IplImage* keyImg,int mode){
             for(int x=0; x<frameW; x++)
             {
                 ///VALORES ALTERADOS PARA TESTE
-                if (mode==1){
+                if (mode==0){
                     temp1 = ptr_img[3*x]   + ptr_key[3*x];
                     temp2 = ptr_img[3*x+1] + ptr_key[3*x+1];
                     temp3 = ptr_img[3*x+2] + ptr_key[3*x+2];
