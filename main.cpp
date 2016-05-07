@@ -16,12 +16,7 @@ int main (int argc, char** argv)
      in = argv[1];
      out = argv[2];
 	
-     printf("Modos Disponíveis:\n 
-	(0)Criptografar\n
-	(1)Descriptografar\n
-	(2)Melhorar Imagem Ruidosa\n
-	(3)Encontrar objeto em imagem Ruidosa\n\n
-	Digite o numero do modo escolhido:");
+    printf("Modos Disponíveis:\n (0)Criptografar\n (1)Descriptografar\n (2)Melhorar Imagem Ruidosa\n (3)Encontrar objeto em imagem Ruidosa\n\n		Digite o numero do modo escolhido: ");
     scanf("%d", &mode);
     if(mode>3||mode<0) return 0;
     if(mode==0||mode==1){
